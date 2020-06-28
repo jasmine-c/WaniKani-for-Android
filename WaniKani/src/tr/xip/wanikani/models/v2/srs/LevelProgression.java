@@ -1,0 +1,27 @@
+package tr.xip.wanikani.models.v2.srs;
+
+import org.joda.time.DateTime;
+
+import java.io.Serializable;
+
+public class LevelProgression implements Serializable {
+    private DateTime abandoned_at;
+    private DateTime completed_at;
+    private DateTime created_at;
+    private int level;
+    private DateTime passed_at;
+    private DateTime started_at;
+    private DateTime unlocked_at;
+
+    public LevelProgression(
+            DateTime abandoned_at, DateTime completed_at, DateTime created_at, int level,
+            DateTime passed_at, DateTime started_at, DateTime unlocked_at) {
+        this.abandoned_at = abandoned_at;
+        this.completed_at = completed_at;
+        this.created_at = created_at;
+        this.level = level;
+        this.passed_at = passed_at;
+        this.started_at = started_at;
+        this.unlocked_at = unlocked_at;
+    }
+}
