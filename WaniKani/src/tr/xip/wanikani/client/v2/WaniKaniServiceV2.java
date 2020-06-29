@@ -1,5 +1,7 @@
 package tr.xip.wanikani.client.v2;
 
+import java.util.Map;
+
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -8,6 +10,7 @@ import retrofit2.http.Header;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
+import retrofit2.http.QueryMap;
 import tr.xip.wanikani.models.v2.BaseResponse;
 import tr.xip.wanikani.models.v2.reviews.Assignment;
 import tr.xip.wanikani.models.v2.Collection;
@@ -32,7 +35,8 @@ public interface WaniKaniServiceV2
     @Headers({"Wanikani-Revision: 20170710"})
     @GET("assignments")
     Call<Collection<Resource<Assignment>>> getAssignments(
-            @Header("Authorization") String api_key);
+            @Header("Authorization") String api_key,
+            @QueryMap Map<String, String> filters);
 
     @Headers({"Wanikani-Revision: 20170710"})
     @GET("assignments/{id}")
@@ -49,7 +53,8 @@ public interface WaniKaniServiceV2
     @Headers({"Wanikani-Revision: 20170710"})
     @GET("level_progressions")
     Call<Collection<Resource<LevelProgression>>> getLevelProgressions(
-            @Header("Authorization") String api_key);
+            @Header("Authorization") String api_key,
+            @QueryMap Map<String, String> filters);
 
     @Headers({"Wanikani-Revision: 20170710"})
     @GET("level_progressions/{id}")
@@ -60,7 +65,8 @@ public interface WaniKaniServiceV2
     @Headers({"Wanikani-Revision: 20170710"})
     @GET("resets")
     Call<Collection<Resource<Reset>>> getResets(
-            @Header("Authorization") String api_key);
+            @Header("Authorization") String api_key,
+            @QueryMap Map<String, String> filters);
 
     @Headers({"Wanikani-Revision: 20170710"})
     @GET("resets/{id}")
@@ -71,7 +77,8 @@ public interface WaniKaniServiceV2
     @Headers({"Wanikani-Revision: 20170710"})
     @GET("reviews")
     Call<Collection<Resource<Review>>> getReviews(
-            @Header("Authorization") String api_key);
+            @Header("Authorization") String api_key,
+            @QueryMap Map<String, String> filters);
 
     @Headers({"Wanikani-Revision: 20170710"})
     @GET("reviews/{id}")
@@ -90,7 +97,8 @@ public interface WaniKaniServiceV2
     @Headers({"Wanikani-Revision: 20170710"})
     @GET("review_statistics")
     Call<Collection<Resource<ReviewStatistic>>> getReviewStatistics(
-            @Header("Authorization") String api_key);
+            @Header("Authorization") String api_key,
+            @QueryMap Map<String, String> filters);
 
     @Headers({"Wanikani-Revision: 20170710"})
     @GET("review_statistics/{id}")
@@ -101,7 +109,8 @@ public interface WaniKaniServiceV2
     @Headers({"Wanikani-Revision: 20170710"})
     @GET("spaced_repetition_systems")
     Call<Collection<Resource<SpacedRepetitionSystem>>> getSpacedRepetitionSystems(
-            @Header("Authorization") String api_key);
+            @Header("Authorization") String api_key,
+            @QueryMap Map<String, String> filters);
 
     @Headers({"Wanikani-Revision: 20170710"})
     @GET("spaced_repetition_systems/{id}")
@@ -112,7 +121,8 @@ public interface WaniKaniServiceV2
     @Headers({"Wanikani-Revision: 20170710"})
     @GET("study_materials")
     Call<Collection<Resource<StudyMaterial>>> getStudyMaterials(
-            @Header("Authorization") String api_key);
+            @Header("Authorization") String api_key,
+            @QueryMap Map<String, String> filters);
 
     @Headers({"Wanikani-Revision: 20170710"})
     @GET("study_materials/{id}")
@@ -140,7 +150,8 @@ public interface WaniKaniServiceV2
     @Headers({"Wanikani-Revision: 20170710"})
     @GET("subjects")
     Call<Collection<Resource<Subject>>> getSubjects(
-            @Header("Authorization") String api_key);
+            @Header("Authorization") String api_key,
+            @QueryMap Map<String, String> filters);
 
     @Headers({"Wanikani-Revision: 20170710"})
     @GET("subjects/{id}")
@@ -169,7 +180,8 @@ public interface WaniKaniServiceV2
     @Headers({"Wanikani-Revision: 20170710"})
     @GET("voice_actors")
     Call<Collection<Resource<VoiceActor>>> getVoiceActors(
-            @Header("Authorization") String api_key);
+            @Header("Authorization") String api_key,
+            @QueryMap Map<String, String> filters);
 
     @Headers({"Wanikani-Revision: 20170710"})
     @GET("voice_actors/{id}")
