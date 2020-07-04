@@ -8,7 +8,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import java.lang.reflect.Type;
 import org.joda.time.DateTime;
-import java.util.*;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -40,7 +39,7 @@ public abstract class WaniKaniApiV2
 {
 
     private static WaniKaniServiceV2 service;
-    private static String API_KEY;
+    private static String authorizationToken;
 
     static
     {
@@ -49,7 +48,7 @@ public abstract class WaniKaniApiV2
 
     public static void init()
     {
-        API_KEY = PrefManager.getApiKey();
+        authorizationToken = "Bearer " + PrefManager.getV2ApiKey();
         setupService();
     }
 
@@ -84,149 +83,149 @@ public abstract class WaniKaniApiV2
 
     public static Call<Collection<Resource<Assignment>>> getAssignments(Filter filters)
     {
-        return service.getAssignments("Bearer d0cd0451-2fb5-445c-9eac-7fa17828242c",
+        return service.getAssignments(authorizationToken,
                 filters.filters);
     }
 
     public static Call<Resource<Assignment>> getAssignment(int id)
     {
-        return service.getAssignment("Bearer d0cd0451-2fb5-445c-9eac-7fa17828242c",
+        return service.getAssignment(authorizationToken,
                 Integer.toString(id));
     }
 
     public static Call<Resource<Assignment>> startAssignment(int id)
     {
-        return service.startAssignment("Bearer d0cd0451-2fb5-445c-9eac-7fa17828242c",
+        return service.startAssignment(authorizationToken,
                 Integer.toString(id));
     }
 
     public static Call<Collection<Resource<LevelProgression>>> getLevelProgressions(Filter filters)
     {
-        return service.getLevelProgressions("Bearer d0cd0451-2fb5-445c-9eac-7fa17828242c",
+        return service.getLevelProgressions(authorizationToken,
                 filters.filters);
     }
 
     public static Call<Resource<LevelProgression>> getLevelProgression(int id)
     {
-        return service.getLevelProgression("Bearer d0cd0451-2fb5-445c-9eac-7fa17828242c",
+        return service.getLevelProgression(authorizationToken,
                 Integer.toString(id));
     }
 
     public static Call<Collection<Resource<Reset>>> getResets(Filter filters)
     {
-        return service.getResets("Bearer d0cd0451-2fb5-445c-9eac-7fa17828242c",
+        return service.getResets(authorizationToken,
                 filters.filters);
     }
 
     public static Call<Resource<Reset>> getReset(int id)
     {
-        return service.getReset("Bearer d0cd0451-2fb5-445c-9eac-7fa17828242c",
+        return service.getReset(authorizationToken,
                 Integer.toString(id));
     }
 
     public static Call<Collection<Resource<Review>>> getReviews(Filter filters)
     {
-        return service.getReviews("Bearer d0cd0451-2fb5-445c-9eac-7fa17828242c",
+        return service.getReviews(authorizationToken,
                 filters.filters);
     }
 
     public static Call<Resource<Review>> getReview(int id)
     {
-        return service.getReview("Bearer d0cd0451-2fb5-445c-9eac-7fa17828242c",
+        return service.getReview(authorizationToken,
                 Integer.toString(id));
     }
 
     public static Call<Resource<ReviewCreateResponse>> createReview(ReviewCreate review)
     {
-        return service.createReview("Bearer d0cd0451-2fb5-445c-9eac-7fa17828242c", review);
+        return service.createReview(authorizationToken, review);
     }
 
     public static Call<Collection<Resource<ReviewStatistic>>> getReviewStatistics(Filter filters)
     {
-        return service.getReviewStatistics("Bearer d0cd0451-2fb5-445c-9eac-7fa17828242c",
+        return service.getReviewStatistics(authorizationToken,
                 filters.filters);
     }
 
     public static Call<Resource<ReviewStatistic>> getReviewStatistic(int id)
     {
-        return service.getReviewStatistic("Bearer d0cd0451-2fb5-445c-9eac-7fa17828242c",
+        return service.getReviewStatistic(authorizationToken,
                 Integer.toString(id));
     }
 
     public static Call<Collection<Resource<SpacedRepetitionSystem>>> getSpacedRepetitionSystems(
             Filter filters)
     {
-        return service.getSpacedRepetitionSystems("Bearer d0cd0451-2fb5-445c-9eac-7fa17828242c",
+        return service.getSpacedRepetitionSystems(authorizationToken,
             filters.filters);
     }
 
     public static Call<Resource<SpacedRepetitionSystem>> getSpacedRepetitionSystem(int id)
     {
-        return service.getSpacedRepetitionSystem("Bearer d0cd0451-2fb5-445c-9eac-7fa17828242c",
+        return service.getSpacedRepetitionSystem(authorizationToken,
                 Integer.toString(id));
     }
 
     public static Call<Collection<Resource<StudyMaterial>>> getStudyMaterials(Filter filters)
     {
-        return service.getStudyMaterials("Bearer d0cd0451-2fb5-445c-9eac-7fa17828242c",
+        return service.getStudyMaterials(authorizationToken,
                 filters.filters);
     }
 
     public static Call<Resource<StudyMaterial>> getStudyMaterial(int id)
     {
-        return service.getStudyMaterial("Bearer d0cd0451-2fb5-445c-9eac-7fa17828242c",
+        return service.getStudyMaterial(authorizationToken,
                 Integer.toString(id));
     }
 
     public static Call<Resource<StudyMaterial>> createStudyMaterial(StudyMaterialCreate studyMaterial)
     {
-        return service.createStudyMaterial("Bearer d0cd0451-2fb5-445c-9eac-7fa17828242c",
+        return service.createStudyMaterial(authorizationToken,
                 studyMaterial);
     }
 
     public static Call<Resource<StudyMaterial>> updateStudyMaterial(
             int id, StudyMaterialCreate studyMaterial)
     {
-        return service.updateStudyMaterial("Bearer d0cd0451-2fb5-445c-9eac-7fa17828242c",
+        return service.updateStudyMaterial(authorizationToken,
                 Integer.toString(id), studyMaterial);
     }
 
     public static Call<Collection<Resource<Subject>>> getSubjects(Filter filters)
     {
-        return service.getSubjects("Bearer d0cd0451-2fb5-445c-9eac-7fa17828242c",
+        return service.getSubjects(authorizationToken,
                 filters.filters);
     }
 
     public static Call<Resource<Subject>> getSubject(int id)
     {
-        return service.getSubject("Bearer d0cd0451-2fb5-445c-9eac-7fa17828242c",
+        return service.getSubject(authorizationToken,
                 Integer.toString(id));
     }
 
     public static Call<BaseResponse<Summary>> getSummary()
     {
-        return service.getSummary("Bearer d0cd0451-2fb5-445c-9eac-7fa17828242c");
+        return service.getSummary(authorizationToken);
     }
 
     public static Call<Resource<User>> getUser()
     {
-        return service.getUser("Bearer d0cd0451-2fb5-445c-9eac-7fa17828242c");
+        return service.getUser(authorizationToken);
     }
 
     public static Call<Resource<User>> updateUser(UserUpdateRequest update)
     {
-        return service.updateUser("Bearer d0cd0451-2fb5-445c-9eac-7fa17828242c", update);
+        return service.updateUser(authorizationToken, update);
     }
 
     public static Call<Collection<Resource<VoiceActor>>> getVoiceActors(Filter filters)
     {
-        return service.getVoiceActors("Bearer d0cd0451-2fb5-445c-9eac-7fa17828242c",
+        return service.getVoiceActors(authorizationToken,
                 filters.filters);
     }
 
     public static Call<Resource<VoiceActor>> getVoiceActor(int id)
     {
-        return service.getVoiceActor("Bearer d0cd0451-2fb5-445c-9eac-7fa17828242c",
+        return service.getVoiceActor(authorizationToken,
                 Integer.toString(id));
     }
 }

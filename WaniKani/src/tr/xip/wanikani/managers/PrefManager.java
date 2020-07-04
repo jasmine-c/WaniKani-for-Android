@@ -69,6 +69,14 @@ public abstract class PrefManager {
         prefs.edit().putString("api_key", key).commit();
     }
 
+    public static String getV2ApiKey() {
+        return prefs.getString("api_key_v2", "d0cd0451-2fb5-445c-9eac-7fa17828242c");
+    }
+
+    public static void setV2ApiKey(String key) {
+        prefs.edit().putString("api_key_v2", key).commit();
+    }
+
     public static boolean isFirstLaunch() {
         return prefs.getBoolean("first_launch", true);
     }

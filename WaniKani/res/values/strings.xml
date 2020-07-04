@@ -124,6 +124,7 @@
     <!-- Login Strings -->
     <string name="action_sign_in">Sign In</string>
     <string name="hint_api_key">API Key</string>
+    <string name="hint_api_key_v2">API Key V2</string>
     <string name="action_how_to_api_key">How do I get my key?</string>
     <string name="error_invalid_api_key">The key provided seems to be invalid. Please check again.</string>
     <string name="error_enter_api_key">API Key can\'t be left empty!</string>

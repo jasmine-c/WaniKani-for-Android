@@ -66,6 +66,17 @@
                             android:textColor="@color/text_gray"
                             android:textColorHint="@color/text_gray_light" />
 
+                        <EditText
+                            android:digits="0123456789abcdef-"
+                            android:id="@+id/first_time_v2_api_key"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/hint_api_key_v2"
+                            android:minWidth="300dp"
+                            android:singleLine="true"
+                            android:textColor="@color/text_gray"
+                            android:textColorHint="@color/text_gray_light" />
+
                         <Button
                             android:id="@+id/first_time_how_to_api_key"
                             android:layout_width="wrap_content"

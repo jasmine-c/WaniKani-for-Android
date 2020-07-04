@@ -16,6 +16,7 @@ import retrofit2.Response;
 import tr.xip.wanikani.R;
 import tr.xip.wanikani.client.WaniKaniApi;
 import tr.xip.wanikani.client.task.callback.ThroughDbCallback;
+import tr.xip.wanikani.client.v2.WaniKaniApiV2;
 import tr.xip.wanikani.content.notification.NotificationScheduler;
 import tr.xip.wanikani.dialogs.HowToGetKeyDialogFragment;
 import tr.xip.wanikani.managers.PrefManager;
@@ -24,6 +25,7 @@ import tr.xip.wanikani.models.User;
 
 public class FirstTimeActivity extends AppCompatActivity {
     EditText mApiKey;
+    EditText mV2ApiKey;
     Button mHowTo;
     Button mSignIn;
 
@@ -39,6 +41,7 @@ public class FirstTimeActivity extends AppCompatActivity {
         context = this;
 
         mApiKey = (EditText) findViewById(R.id.first_time_api_key);
+        mV2ApiKey = (EditText) findViewById(R.id.first_time_v2_api_key);
         mHowTo = (Button) findViewById(R.id.first_time_how_to_api_key);
         mSignIn = (Button) findViewById(R.id.first_time_sign_in);
 
@@ -56,7 +59,8 @@ public class FirstTimeActivity extends AppCompatActivity {
         mSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (TextUtils.isEmpty(mApiKey.getText().toString())) {
+                if (TextUtils.isEmpty(mApiKey.getText().toString())
+                        || TextUtils.isEmpty(mV2ApiKey.getText().toString())) {
                     Toast.makeText(context, R.string.error_enter_api_key, Toast.LENGTH_SHORT).show();
                 } else {
                     if (mViewSwitcher.getDisplayedChild() == 0) {
@@ -69,8 +73,10 @@ public class FirstTimeActivity extends AppCompatActivity {
                             super.onResponse(call, response);
                             if (response.isSuccessful() && response.body().user_information != null) {
                                 PrefManager.setApiKey(mApiKey.getText().toString());
+                                PrefManager.setV2ApiKey(mV2ApiKey.getText().toString());
                                 PrefManager.setFirstLaunch(false);
                                 WaniKaniApi.init();
+                                WaniKaniApiV2.init();
                                 startActivity(new Intent(context, MainActivity.class));
 
                                 // Set an alarm for notifications for the first time
