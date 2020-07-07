@@ -6,10 +6,13 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import org.joda.time.DateTime;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import tr.xip.wanikani.client.v2.Filter;
 import tr.xip.wanikani.database.table.CriticalItemsTable;
 import tr.xip.wanikani.database.table.ItemsTable;
 import tr.xip.wanikani.database.table.LevelProgressionTable;
@@ -18,6 +21,7 @@ import tr.xip.wanikani.database.table.RecentUnlocksTable;
 import tr.xip.wanikani.database.table.SRSDistributionTable;
 import tr.xip.wanikani.database.table.StudyQueueTable;
 import tr.xip.wanikani.database.table.UsersTable;
+import tr.xip.wanikani.database.v2.SummaryTable;
 import tr.xip.wanikani.managers.PrefManager;
 import tr.xip.wanikani.models.BaseItem;
 import tr.xip.wanikani.models.CriticalItem;
@@ -30,6 +34,9 @@ import tr.xip.wanikani.models.SRSDistribution;
 import tr.xip.wanikani.models.StudyQueue;
 import tr.xip.wanikani.models.UnlockItem;
 import tr.xip.wanikani.models.User;
+import tr.xip.wanikani.models.v2.reviews.Lesson;
+import tr.xip.wanikani.models.v2.reviews.Summary;
+import tr.xip.wanikani.models.v2.reviews.SummaryData;
 
 public class DatabaseManager {
     private static final String TAG = "Database Manager";
@@ -399,6 +406,97 @@ public class DatabaseManager {
 
             db.delete(CriticalItemsTable.TABLE_NAME, whereClause, whereArgs);
         }
+    }
+
+    public static void saveSummary(Summary summary) {
+        deleteSummary();
+
+        for (Lesson lesson : summary.data.lessons) {
+            InsertLesson(lesson, lesson.subject_ids, "lesson");
+        }
+
+        for (Lesson review : summary.data.reviews) {
+            InsertLesson(review, review.subject_ids, "review");
+        }
+    }
+
+    private static void InsertLesson(Lesson lesson, ArrayList<Integer> ids, String type) {
+        ContentValues values = new ContentValues();
+
+        values.put(SummaryTable.COLUMN_NAME_SUBJECT_ID, Filter.encodeParamsArray(ids.toArray()));
+        values.put(SummaryTable.COLUMN_NAME_AVAILABLE_AT, lesson.available_at.getMillis());
+        values.put(SummaryTable.COLUMN_NAME_TYPE, type);
+
+        db.insert(StudyQueueTable.TABLE_NAME, StudyQueueTable.COLUMN_NAME_NULLABLE, values);
+    }
+
+    public static void deleteSummary() {
+        db.delete(SummaryTable.TABLE_NAME, null, null);
+    }
+
+    public static Summary getSummary() {
+        Cursor c = null;
+
+        try {
+            c = db.query(
+                    SummaryTable.TABLE_NAME,
+                    SummaryTable.COLUMNS,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+            );
+
+            if (c == null || !c.moveToFirst())
+            {
+                Log.e(TAG, "No summary found; returning null");
+                return null;
+            }
+
+            ArrayList<Lesson> lessons = new ArrayList<>();
+            ArrayList<Lesson> reviews = new ArrayList<>();
+            DateTime nextReview = new DateTime(0);
+
+            do {
+                String type = c.getString(c.getColumnIndexOrThrow(SummaryTable.COLUMN_NAME_TYPE));
+
+                switch (type)
+                {
+                    case "lesson":
+                        lessons.add(getLesson(c));
+                        break;
+                    case "review":
+                        reviews.add(getLesson(c));
+                        break;
+                }
+            } while (c.moveToNext());
+
+            return new Summary(null, null, null,
+                    new SummaryData(lessons, nextReview, reviews));
+        } finally {
+            if (c != null) {
+                c.close();
+            }
+        }
+    }
+
+    private static Lesson getLesson(Cursor c)
+    {
+        DateTime availableAt = new DateTime(
+                c.getInt(c.getColumnIndexOrThrow(SummaryTable.COLUMN_NAME_AVAILABLE_AT)));
+
+        String ids = c.getString(c.getColumnIndexOrThrow(SummaryTable.COLUMN_NAME_SUBJECT_ID));
+
+        String[] idsArray = ids.split(",");
+
+        ArrayList<Integer> intIds = new ArrayList<>();
+
+        for (String id : idsArray) {
+            intIds.add(Integer.parseInt(id));
+        }
+
+        return new Lesson(availableAt, intIds);
     }
 
     public static void saveStudyQueue(StudyQueue queue) {

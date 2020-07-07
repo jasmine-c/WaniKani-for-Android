@@ -202,7 +202,7 @@ public abstract class WaniKaniApiV2
                 Integer.toString(id));
     }
 
-    public static Call<BaseResponse<Summary>> getSummary()
+    public static Call<Summary> getSummary()
     {
         return service.getSummary(authorizationToken);
     }

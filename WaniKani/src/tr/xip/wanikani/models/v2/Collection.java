@@ -1,5 +1,6 @@
 package tr.xip.wanikani.models.v2;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.joda.time.DateTime;
 
 import java.io.Serializable;
@@ -15,5 +16,10 @@ public class Collection<T> extends BaseResponse<ArrayList<T>> implements Seriali
         super(object, url, data_updated_at, data);
         this.pages = pages;
         this.total_count = total_count;
+    }
+
+    @Override
+    public void save() {
+        throw new NotImplementedException("Implement save!!");
     }
 }

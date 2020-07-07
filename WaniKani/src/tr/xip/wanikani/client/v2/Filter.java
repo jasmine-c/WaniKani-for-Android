@@ -145,7 +145,7 @@ public class Filter {
         return this;
     }
 
-    private static <T> String encodeParamsArray(T[] params)
+    public static <T> String encodeParamsArray(T[] params)
     {
         StringBuilder builder = new StringBuilder();
 

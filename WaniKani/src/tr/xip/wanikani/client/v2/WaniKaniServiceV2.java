@@ -161,7 +161,7 @@ public interface WaniKaniServiceV2
 
     @Headers({"Wanikani-Revision: 20170710"})
     @GET("summary")
-    Call<BaseResponse<Summary>> getSummary(
+    Call<Summary> getSummary(
             @Header("Authorization") String api_key);
 
     @Headers({"Wanikani-Revision: 20170710"})

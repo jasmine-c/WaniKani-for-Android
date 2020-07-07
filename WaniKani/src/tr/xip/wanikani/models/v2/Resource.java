@@ -1,5 +1,6 @@
 package tr.xip.wanikani.models.v2;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.joda.time.DateTime;
 
 import java.io.Serializable;
@@ -12,5 +13,10 @@ public class Resource<T> extends BaseResponse<T> implements Serializable
     {
         super(object, url, data_updated_at, data);
         this.id = id;
+    }
+
+    @Override
+    public void save() {
+        throw new NotImplementedException("Implement save!!");
     }
 }

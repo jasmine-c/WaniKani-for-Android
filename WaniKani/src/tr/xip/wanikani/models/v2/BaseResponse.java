@@ -4,12 +4,14 @@ import org.joda.time.DateTime;
 
 import java.io.Serializable;
 
-public abstract class BaseResponse<T> implements Serializable
+import tr.xip.wanikani.models.Storable;
+
+public abstract class BaseResponse<T> implements Serializable, Storable
 {
     protected String object;
     protected String url;
-    protected DateTime data_updated_at;
-    protected T data;
+    public DateTime data_updated_at;
+    public T data;
 
     protected BaseResponse(String object, String url, DateTime data_updated_at, T data)
     {

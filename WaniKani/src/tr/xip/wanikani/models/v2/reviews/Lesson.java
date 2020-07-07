@@ -6,8 +6,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class Lesson implements Serializable {
-    private DateTime available_at;
-    private ArrayList<Integer> subject_ids;
+    public DateTime available_at;
+    public ArrayList<Integer> subject_ids;
 
     public Lesson(DateTime available_at, ArrayList<Integer> subject_ids) {
         this.available_at = available_at;

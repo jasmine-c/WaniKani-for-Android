@@ -11,7 +11,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static DatabaseHelper mInstance = null;
 
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
     private static final String DATABASE_NAME = "database.db";
 
     public static DatabaseHelper getInstance(Context ctx) {
@@ -39,6 +39,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(SQL.CREATE_TABLE_LEVEL_PROGRESSION);
         db.execSQL(SQL.CREATE_TABLE_SRS);
         db.execSQL(SQL.CREATE_TABLE_NOTIFICATIONS);
+        db.execSQL(SQL.CREATE_TABLE_SUMMARY);
     }
 
     @Override
@@ -47,6 +48,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             case 1:
                 db.execSQL(SQL.CREATE_TABLE_NOTIFICATIONS);
                 break;
+            case 2:
+                db.execSQL(SQL.CREATE_TABLE_SUMMARY);
         }
     }
 }

@@ -8,6 +8,7 @@ import tr.xip.wanikani.database.table.RecentUnlocksTable;
 import tr.xip.wanikani.database.table.SRSDistributionTable;
 import tr.xip.wanikani.database.table.StudyQueueTable;
 import tr.xip.wanikani.database.table.UsersTable;
+import tr.xip.wanikani.database.v2.SummaryTable;
 
 public class SQL {
 
@@ -195,6 +196,14 @@ public class SQL {
             + NotificationsTable.COLUMN_NAME_ACTION_TEXT + TEXT_TYPE + COMMA_SEP
             + NotificationsTable.COLUMN_NAME_READ + INTEGER_TYPE + COMMA_SEP
             + NotificationsTable.COLUMN_NAME_NULLABLE + TEXT_TYPE + ")";
+
+    public static final String CREATE_TABLE_SUMMARY = "CREATE TABLE "
+            + SummaryTable.TABLE_NAME + " ("
+            + SummaryTable.COLUMN_NAME_ID + INTEGER_PRIMARY_KEY + COMMA_SEP
+            + SummaryTable.COLUMN_NAME_SUBJECT_ID + TEXT_TYPE + COMMA_SEP
+            + SummaryTable.COLUMN_NAME_TYPE + TEXT_TYPE + COMMA_SEP
+            + SummaryTable.COLUMN_NAME_AVAILABLE_AT + INTEGER_TYPE + COMMA_SEP
+            + SummaryTable.COLUMN_NAME_NULLABLE + TEXT_TYPE + ")";
 
     public static final String DELETE_TABLE_NOTIFICATIONS = "DROP TABLE IF EXISTS "
             + NotificationsTable.TABLE_NAME;
