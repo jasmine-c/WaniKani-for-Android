@@ -21,8 +21,8 @@ import tr.xip.wanikani.database.table.RecentUnlocksTable;
 import tr.xip.wanikani.database.table.SRSDistributionTable;
 import tr.xip.wanikani.database.table.StudyQueueTable;
 import tr.xip.wanikani.database.table.UsersTable;
+import tr.xip.wanikani.database.v2.LastUpdatedTable;
 import tr.xip.wanikani.database.v2.SummaryTable;
-import tr.xip.wanikani.managers.PrefManager;
 import tr.xip.wanikani.models.BaseItem;
 import tr.xip.wanikani.models.CriticalItem;
 import tr.xip.wanikani.models.CriticalItemsList;
@@ -497,6 +497,53 @@ public class DatabaseManager {
         }
 
         return new Lesson(availableAt, intIds);
+    }
+
+    public static void saveLastUpdated(String queryName, DateTime updateTime)
+    {
+        String whereClause = LastUpdatedTable.COLUMN_NAME_QUERY_NAME + " = ?";
+        String[] whereArgs = { queryName };
+        db.delete(LastUpdatedTable.TABLE_NAME, whereClause, whereArgs);
+
+        ContentValues values = new ContentValues();
+
+        values.put(LastUpdatedTable.COLUMN_NAME_QUERY_NAME, queryName);
+        values.put(LastUpdatedTable.COLUMN_NAME_QUERY_DATE, updateTime.getMillis());
+
+        db.insert(LastUpdatedTable.TABLE_NAME, LastUpdatedTable.COLUMN_NAME_NULLABLE, values);
+    }
+
+    public static DateTime getLastUpdated(String queryName)
+    {
+        String whereClause = LastUpdatedTable.COLUMN_NAME_QUERY_NAME + " = ?";
+        String[] whereArgs = { queryName };
+
+        Cursor c = null;
+
+        try {
+            c = db.query(
+                    LastUpdatedTable.TABLE_NAME,
+                    LastUpdatedTable.COLUMNS,
+                    whereClause,
+                    whereArgs,
+                    null,
+                    null,
+                    null
+            );
+
+            if (c == null || !c.moveToFirst())
+            {
+                Log.e(TAG, "No last update time found for " + queryName + "; returning null");
+                return null;
+            }
+
+            return new DateTime(c.getLong(c.getColumnIndexOrThrow(LastUpdatedTable.COLUMN_NAME_QUERY_DATE)));
+
+        } finally {
+            if (c != null) {
+                c.close();
+            }
+        }
     }
 
     public static void saveStudyQueue(StudyQueue queue) {

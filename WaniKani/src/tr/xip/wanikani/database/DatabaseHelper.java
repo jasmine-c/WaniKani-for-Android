@@ -40,6 +40,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(SQL.CREATE_TABLE_SRS);
         db.execSQL(SQL.CREATE_TABLE_NOTIFICATIONS);
         db.execSQL(SQL.CREATE_TABLE_SUMMARY);
+        db.execSQL(SQL.CREATE_TABLE_LAST_UPDATED);
     }
 
     @Override
@@ -50,6 +51,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 break;
             case 2:
                 db.execSQL(SQL.CREATE_TABLE_SUMMARY);
+                db.execSQL(SQL.DELETE_TABLE_STUDY_QUEUE);
+                db.execSQL(SQL.CREATE_TABLE_LAST_UPDATED);
         }
     }
 }
