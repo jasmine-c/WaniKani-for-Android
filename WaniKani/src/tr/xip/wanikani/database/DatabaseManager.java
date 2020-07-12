@@ -3,6 +3,7 @@ package tr.xip.wanikani.database;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 import android.util.Log;
@@ -12,6 +13,8 @@ import org.joda.time.DateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import tr.xip.wanikani.client.v2.Filter;
 import tr.xip.wanikani.database.table.CriticalItemsTable;
@@ -22,6 +25,7 @@ import tr.xip.wanikani.database.table.RecentUnlocksTable;
 import tr.xip.wanikani.database.table.SRSDistributionTable;
 import tr.xip.wanikani.database.table.StudyQueueTable;
 import tr.xip.wanikani.database.table.UsersTable;
+import tr.xip.wanikani.database.v2.AssignmentsTable;
 import tr.xip.wanikani.database.v2.LastUpdatedTable;
 import tr.xip.wanikani.database.v2.SummaryTable;
 import tr.xip.wanikani.models.BaseItem;
@@ -35,6 +39,8 @@ import tr.xip.wanikani.models.SRSDistribution;
 import tr.xip.wanikani.models.StudyQueue;
 import tr.xip.wanikani.models.UnlockItem;
 import tr.xip.wanikani.models.User;
+import tr.xip.wanikani.models.v2.reviews.Assignment;
+import tr.xip.wanikani.models.v2.reviews.AssignmentData;
 import tr.xip.wanikani.models.v2.reviews.Lesson;
 import tr.xip.wanikani.models.v2.reviews.Summary;
 import tr.xip.wanikani.models.v2.reviews.SummaryData;
@@ -43,6 +49,10 @@ public class DatabaseManager {
     private static final String TAG = "Database Manager";
 
     private static SQLiteDatabase db;
+
+    private static ReadWriteLock AssignmentsLock = new ReentrantReadWriteLock();
+    private static ReadWriteLock LastUpdatedLock = new ReentrantReadWriteLock();
+    private static ReadWriteLock SummaryLock = new ReentrantReadWriteLock();
 
     public static void init(Context context) {
         if (db == null) {
@@ -410,14 +420,21 @@ public class DatabaseManager {
     }
 
     public static void saveSummary(Summary summary) {
-        deleteSummary();
+        SummaryLock.writeLock().lock();
 
-        for (Lesson lesson : summary.data.lessons) {
-            InsertLesson(lesson, lesson.subject_ids, "lesson");
+        try {
+            deleteSummary();
+
+            for (Lesson lesson : summary.data.lessons) {
+                InsertLesson(lesson, lesson.subject_ids, "lesson");
+            }
+
+            for (Lesson review : summary.data.reviews) {
+                InsertLesson(review, review.subject_ids, "review");
+            }
         }
-
-        for (Lesson review : summary.data.reviews) {
-            InsertLesson(review, review.subject_ids, "review");
+        finally {
+            SummaryLock.writeLock().unlock();
         }
     }
 
@@ -428,14 +445,16 @@ public class DatabaseManager {
         values.put(SummaryTable.COLUMN_NAME_AVAILABLE_AT, lesson.available_at.getMillis());
         values.put(SummaryTable.COLUMN_NAME_TYPE, type);
 
-        db.insert(StudyQueueTable.TABLE_NAME, StudyQueueTable.COLUMN_NAME_NULLABLE, values);
+        db.insert(SummaryTable.TABLE_NAME, SummaryTable.COLUMN_NAME_NULLABLE, values);
     }
 
-    public static void deleteSummary() {
+    private static void deleteSummary() {
         db.delete(SummaryTable.TABLE_NAME, null, null);
     }
 
     public static Summary getSummary() {
+        SummaryLock.readLock().lock();
+
         Cursor c = null;
 
         try {
@@ -476,6 +495,8 @@ public class DatabaseManager {
             return new Summary(null, null, null,
                     new SummaryData(lessons, nextReview, reviews));
         } finally {
+            SummaryLock.readLock().unlock();
+
             if (c != null) {
                 c.close();
             }
@@ -504,49 +525,124 @@ public class DatabaseManager {
 
     public static void saveLastUpdated(String queryName, DateTime updateTime)
     {
-        String whereClause = LastUpdatedTable.COLUMN_NAME_QUERY_NAME + " = ?";
-        String[] whereArgs = { queryName };
-        db.delete(LastUpdatedTable.TABLE_NAME, whereClause, whereArgs);
+        LastUpdatedLock.writeLock().lock();
 
-        ContentValues values = new ContentValues();
+        try {
+            String whereClause = LastUpdatedTable.COLUMN_NAME_QUERY_NAME + " = ?";
+            String[] whereArgs = {queryName};
+            db.delete(LastUpdatedTable.TABLE_NAME, whereClause, whereArgs);
 
-        values.put(LastUpdatedTable.COLUMN_NAME_QUERY_NAME, queryName);
-        values.put(LastUpdatedTable.COLUMN_NAME_QUERY_DATE, updateTime.getMillis());
+            ContentValues values = new ContentValues();
 
-        db.insert(LastUpdatedTable.TABLE_NAME, LastUpdatedTable.COLUMN_NAME_NULLABLE, values);
+            values.put(LastUpdatedTable.COLUMN_NAME_QUERY_NAME, queryName);
+            values.put(LastUpdatedTable.COLUMN_NAME_QUERY_DATE, updateTime.getMillis());
+
+            db.insert(LastUpdatedTable.TABLE_NAME, LastUpdatedTable.COLUMN_NAME_NULLABLE, values);
+        }
+        finally {
+            LastUpdatedLock.writeLock().unlock();
+        }
     }
 
     public static DateTime getLastUpdated(String queryName)
     {
-        String whereClause = LastUpdatedTable.COLUMN_NAME_QUERY_NAME + " = ?";
-        String[] whereArgs = { queryName };
-
-        Cursor c = null;
+        LastUpdatedLock.readLock().lock();
 
         try {
-            c = db.query(
-                    LastUpdatedTable.TABLE_NAME,
-                    LastUpdatedTable.COLUMNS,
-                    whereClause,
-                    whereArgs,
-                    null,
-                    null,
-                    null
-            );
+            String whereClause = LastUpdatedTable.COLUMN_NAME_QUERY_NAME + " = ?";
+            String[] whereArgs = {queryName};
 
-            if (c == null || !c.moveToFirst())
-            {
-                Log.e(TAG, "No last update time found for " + queryName + "; returning null");
-                return null;
-            }
+            Cursor c = null;
 
-            return new DateTime(c.getLong(c.getColumnIndexOrThrow(LastUpdatedTable.COLUMN_NAME_QUERY_DATE)));
+            try {
+                c = db.query(
+                        LastUpdatedTable.TABLE_NAME,
+                        LastUpdatedTable.COLUMNS,
+                        whereClause,
+                        whereArgs,
+                        null,
+                        null,
+                        null
+                );
 
-        } finally {
-            if (c != null) {
-                c.close();
+                if (c == null || !c.moveToFirst()) {
+                    Log.e(TAG, "No last update time found for " + queryName + "; returning minimal time");
+                    return new DateTime(0);
+                }
+
+                return new DateTime(c.getLong(c.getColumnIndexOrThrow(LastUpdatedTable.COLUMN_NAME_QUERY_DATE)));
+
+            } finally {
+                if (c != null) {
+                    c.close();
+                }
             }
         }
+        finally {
+            LastUpdatedLock.readLock().unlock();
+        }
+    }
+
+    public static void saveAssignments(ArrayList<Assignment> assignments)
+    {
+        AssignmentsLock.writeLock().lock();
+
+        try {
+            deleteAssignments(assignments);
+
+            for (Assignment assignment :
+                    assignments) {
+                saveAssignment(assignment.data);
+            }
+        }
+        finally {
+            AssignmentsLock.writeLock().unlock();
+        }
+    }
+
+    private static void deleteAssignments(ArrayList<Assignment> assignments)
+    {
+        ArrayList<Integer> subjectIds = new ArrayList<>();
+
+        for (Assignment assignment :
+                assignments) {
+            subjectIds.add(assignment.data.subject_id);
+        }
+
+        String whereClause = AssignmentsTable.COLUMN_NAME_SUBJECT_ID + " IN (?)";
+        String[] whereArgs = { TextUtils.join(",", subjectIds) };
+
+        db.delete(AssignmentsTable.TABLE_NAME, whereClause, whereArgs);
+    }
+
+    private static void saveAssignment(AssignmentData assignment)
+    {
+        ContentValues values = new ContentValues();
+
+        values.put(AssignmentsTable.COLUMN_NAME_SUBJECT_ID, assignment.subject_id);
+        values.put(AssignmentsTable.COLUMN_NAME_SUBJECT_TYPE, assignment.subject_type);
+        values.put(AssignmentsTable.COLUMN_NAME_SRS_STAGE, assignment.srs_stage);
+        values.put(AssignmentsTable.COLUMN_NAME_CREATED_AT, assignment.created_at.getMillis());
+
+        if (assignment.unlocked_at == null) values.putNull(AssignmentsTable.COLUMN_NAME_UNLOCKED_AT);
+        else values.put(AssignmentsTable.COLUMN_NAME_UNLOCKED_AT, assignment.unlocked_at.getMillis());
+
+        if (assignment.started_at == null) values.putNull(AssignmentsTable.COLUMN_NAME_STARTED_AT);
+        else values.put(AssignmentsTable.COLUMN_NAME_STARTED_AT, assignment.started_at.getMillis());
+
+        if (assignment.passed_at == null) values.putNull(AssignmentsTable.COLUMN_NAME_PASSED_AT);
+        else values.put(AssignmentsTable.COLUMN_NAME_PASSED_AT, assignment.passed_at.getMillis());
+
+        if (assignment.burned_at == null) values.putNull(AssignmentsTable.COLUMN_NAME_BURNED_AT);
+        else values.put(AssignmentsTable.COLUMN_NAME_BURNED_AT, assignment.burned_at.getMillis());
+
+        if (assignment.available_at == null) values.putNull(AssignmentsTable.COLUMN_NAME_AVAILABLE_AT);
+        else values.put(AssignmentsTable.COLUMN_NAME_AVAILABLE_AT, assignment.available_at.getMillis());
+
+        if (assignment.resurrected_at == null) values.putNull(AssignmentsTable.COLUMN_NAME_RESURRECTED_AT);
+        else values.put(AssignmentsTable.COLUMN_NAME_RESURRECTED_AT, assignment.resurrected_at.getMillis());
+
+        db.insert(AssignmentsTable.TABLE_NAME, AssignmentsTable.COLUMN_NAME_NULLABLE, values);
     }
 
     public static void saveStudyQueue(StudyQueue queue) {
@@ -673,47 +769,40 @@ public class DatabaseManager {
     }
 
     public static SRSDistribution getSrsDistribution() {
-        Cursor c = null;
+        AssignmentsLock.readLock().lock();
 
         try {
-            c = db.query(
-                    SRSDistributionTable.TABLE_NAME,
-                    SRSDistributionTable.COLUMNS,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
-            );
+            String whereClause = AssignmentsTable.COLUMN_NAME_SUBJECT_TYPE + " = ? AND "
+                    + AssignmentsTable.COLUMN_NAME_SRS_STAGE + " >= ? AND "
+                    + AssignmentsTable.COLUMN_NAME_SRS_STAGE + " <= ?";
 
-            if (c != null && c.moveToFirst()) {
-                return new SRSDistribution(
-                        c.getInt(c.getColumnIndexOrThrow(SRSDistributionTable.COLUMN_NAME_ID)),
-                        c.getInt(c.getColumnIndexOrThrow(SRSDistributionTable.COLUMN_NAME_APPRENTICE_RADICALS)),
-                        c.getInt(c.getColumnIndexOrThrow(SRSDistributionTable.COLUMN_NAME_APPRENTICE_KANJI)),
-                        c.getInt(c.getColumnIndexOrThrow(SRSDistributionTable.COLUMN_NAME_APPRENTICE_VOCABULARY)),
-                        c.getInt(c.getColumnIndexOrThrow(SRSDistributionTable.COLUMN_NAME_GURU_RADICALS)),
-                        c.getInt(c.getColumnIndexOrThrow(SRSDistributionTable.COLUMN_NAME_GURU_KANJI)),
-                        c.getInt(c.getColumnIndexOrThrow(SRSDistributionTable.COLUMN_NAME_GURU_VOCABULARY)),
-                        c.getInt(c.getColumnIndexOrThrow(SRSDistributionTable.COLUMN_NAME_MASTER_RADICALS)),
-                        c.getInt(c.getColumnIndexOrThrow(SRSDistributionTable.COLUMN_NAME_MASTER_KANJI)),
-                        c.getInt(c.getColumnIndexOrThrow(SRSDistributionTable.COLUMN_NAME_MASTER_VOCABULARY)),
-                        c.getInt(c.getColumnIndexOrThrow(SRSDistributionTable.COLUMN_NAME_ENLIGHTENED_RADICALS)),
-                        c.getInt(c.getColumnIndexOrThrow(SRSDistributionTable.COLUMN_NAME_ENLIGHTENED_KANJI)),
-                        c.getInt(c.getColumnIndexOrThrow(SRSDistributionTable.COLUMN_NAME_ENLIGHTENED_VOCABULARY)),
-                        c.getInt(c.getColumnIndexOrThrow(SRSDistributionTable.COLUMN_NAME_BURNED_RADICALS)),
-                        c.getInt(c.getColumnIndexOrThrow(SRSDistributionTable.COLUMN_NAME_BURNED_KANJI)),
-                        c.getInt(c.getColumnIndexOrThrow(SRSDistributionTable.COLUMN_NAME_BURNED_VOCABULARY))
-                );
-            } else {
-                Log.e(TAG, "No srs distribution found; returning null");
-                return null;
-            }
-        } finally {
-            if (c != null) {
-                c.close();
-            }
+            return new SRSDistribution(
+                    0,
+                    (int) getRowCount(AssignmentsTable.TABLE_NAME, whereClause, new String[]{"radical", "1", "4"}),
+                    (int) getRowCount(AssignmentsTable.TABLE_NAME, whereClause, new String[]{"kanji", "1", "4"}),
+                    (int) getRowCount(AssignmentsTable.TABLE_NAME, whereClause, new String[]{"vocabulary", "1", "4"}),
+                    (int) getRowCount(AssignmentsTable.TABLE_NAME, whereClause, new String[]{"radical", "5", "6"}),
+                    (int) getRowCount(AssignmentsTable.TABLE_NAME, whereClause, new String[]{"kanji", "5", "6"}),
+                    (int) getRowCount(AssignmentsTable.TABLE_NAME, whereClause, new String[]{"vocabulary", "5", "6"}),
+                    (int) getRowCount(AssignmentsTable.TABLE_NAME, whereClause, new String[]{"radical", "7", "7"}),
+                    (int) getRowCount(AssignmentsTable.TABLE_NAME, whereClause, new String[]{"kanji", "7", "7"}),
+                    (int) getRowCount(AssignmentsTable.TABLE_NAME, whereClause, new String[]{"vocabulary", "7", "7"}),
+                    (int) getRowCount(AssignmentsTable.TABLE_NAME, whereClause, new String[]{"radical", "8", "8"}),
+                    (int) getRowCount(AssignmentsTable.TABLE_NAME, whereClause, new String[]{"kanji", "8", "8"}),
+                    (int) getRowCount(AssignmentsTable.TABLE_NAME, whereClause, new String[]{"vocabulary", "8", "8"}),
+                    (int) getRowCount(AssignmentsTable.TABLE_NAME, whereClause, new String[]{"radical", "9", "9"}),
+                    (int) getRowCount(AssignmentsTable.TABLE_NAME, whereClause, new String[]{"kanji", "9", "9"}),
+                    (int) getRowCount(AssignmentsTable.TABLE_NAME, whereClause, new String[]{"vocabulary", "9", "9"})
+            );
         }
+        finally {
+            AssignmentsLock.readLock().unlock();
+        }
+    }
+
+    private static long getRowCount(String table, String where, String[] whereArgs)
+    {
+        return DatabaseUtils.queryNumEntries(db, table, where, whereArgs);
     }
 
     public static void deleteSrsDistribution() {

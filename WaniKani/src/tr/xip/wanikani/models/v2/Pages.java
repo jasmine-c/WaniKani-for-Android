@@ -4,9 +4,9 @@ import java.io.Serializable;
 
 public class Pages implements Serializable
 {
-    private String next_url;
-    private String previous_url;
-    private int per_page;
+    public String next_url;
+    public String previous_url;
+    public int per_page;
 
     public Pages(String next_url, String previous_url, int per_page)
     {

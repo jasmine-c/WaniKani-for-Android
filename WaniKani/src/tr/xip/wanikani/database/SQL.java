@@ -8,6 +8,7 @@ import tr.xip.wanikani.database.table.RecentUnlocksTable;
 import tr.xip.wanikani.database.table.SRSDistributionTable;
 import tr.xip.wanikani.database.table.StudyQueueTable;
 import tr.xip.wanikani.database.table.UsersTable;
+import tr.xip.wanikani.database.v2.AssignmentsTable;
 import tr.xip.wanikani.database.v2.LastUpdatedTable;
 import tr.xip.wanikani.database.v2.SummaryTable;
 
@@ -221,4 +222,22 @@ public class SQL {
 
     public static final String DELETE_TABLE_LAST_UPDATED = "DROP TABLE IF EXISTS "
             + LastUpdatedTable.TABLE_NAME;
+
+    public static final String CREATE_TABLE_ASSIGNMENTS = "CREATE TABLE "
+            + AssignmentsTable.TABLE_NAME + " ("
+            + AssignmentsTable.COLUMN_NAME_ID + INTEGER_PRIMARY_KEY + COMMA_SEP
+            + AssignmentsTable.COLUMN_NAME_SUBJECT_ID + INTEGER_TYPE + COMMA_SEP
+            + AssignmentsTable.COLUMN_NAME_SUBJECT_TYPE + TEXT_TYPE + COMMA_SEP
+            + AssignmentsTable.COLUMN_NAME_SRS_STAGE + INTEGER_TYPE + COMMA_SEP
+            + AssignmentsTable.COLUMN_NAME_CREATED_AT + INTEGER_TYPE + COMMA_SEP
+            + AssignmentsTable.COLUMN_NAME_UNLOCKED_AT + INTEGER_TYPE + COMMA_SEP
+            + AssignmentsTable.COLUMN_NAME_STARTED_AT + INTEGER_TYPE + COMMA_SEP
+            + AssignmentsTable.COLUMN_NAME_PASSED_AT + INTEGER_TYPE + COMMA_SEP
+            + AssignmentsTable.COLUMN_NAME_BURNED_AT + INTEGER_TYPE + COMMA_SEP
+            + AssignmentsTable.COLUMN_NAME_AVAILABLE_AT + INTEGER_TYPE + COMMA_SEP
+            + AssignmentsTable.COLUMN_NAME_RESURRECTED_AT + INTEGER_TYPE + COMMA_SEP
+            + AssignmentsTable.COLUMN_NAME_NULLABLE + TEXT_TYPE + ")";
+
+    public static final String DELETE_TABLE_ASSIGNMENTS = "DROP TABLE IF EXISTS "
+            + AssignmentsTable.TABLE_NAME;
 }

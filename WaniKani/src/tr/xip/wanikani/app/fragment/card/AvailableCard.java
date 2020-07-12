@@ -26,16 +26,12 @@ import tr.xip.wanikani.app.activity.Browser;
 import tr.xip.wanikani.app.activity.WebReviewActivity;
 import tr.xip.wanikani.app.fragment.DashboardFragment;
 import tr.xip.wanikani.client.WaniKaniApi;
-import tr.xip.wanikani.client.task.callback.ThroughDbCallback;
 import tr.xip.wanikani.client.task.callback.ThroughDbCallbackV2;
 import tr.xip.wanikani.client.v2.WaniKaniApiV2;
 import tr.xip.wanikani.content.receiver.BroadcastIntents;
 import tr.xip.wanikani.database.DatabaseManager;
 import tr.xip.wanikani.managers.PrefManager;
-import tr.xip.wanikani.models.Request;
-import tr.xip.wanikani.models.StudyQueue;
 import tr.xip.wanikani.models.User;
-import tr.xip.wanikani.models.v2.BaseResponse;
 import tr.xip.wanikani.models.v2.reviews.Summary;
 import tr.xip.wanikani.utils.Utils;
 
@@ -68,7 +64,17 @@ public class AvailableCard extends Fragment {
                     super.onResponse(call, response);
 
                     if (response.isSuccessful() && response.body() != null) {
-                        displayData(DatabaseManager.getUser(), response.body());
+                        try {
+                            User user = DatabaseManager.getUser();
+                            if (user == null) {
+                                user = WaniKaniApi.getUser().execute().body().requested_information;
+                                user.save();
+                            }
+                            displayData(DatabaseManager.getUser(), response.body());
+                        }
+                        catch (Exception e) {
+                            onFailure(call, e);
+                        }
                     } else {
                         onFailure(call, null);
                     }

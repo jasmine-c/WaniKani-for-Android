@@ -64,7 +64,17 @@ public class ReviewsCard extends Fragment {
                     super.onResponse(call, response);
 
                     if (response.isSuccessful() && response.body() != null) {
-                        displayData(DatabaseManager.getUser(), response.body());
+                        try {
+                            User user = DatabaseManager.getUser();
+                            if (user == null) {
+                                user = WaniKaniApi.getUser().execute().body().requested_information;
+                                user.save();
+                            }
+
+                            displayData(DatabaseManager.getUser(), response.body());
+                        } catch (Exception e) {
+                            onFailure(call, e);
+                        }
                     } else {
                         onFailure(call, null);
                     }

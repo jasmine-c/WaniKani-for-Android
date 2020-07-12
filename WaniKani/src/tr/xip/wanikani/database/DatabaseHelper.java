@@ -35,12 +35,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(SQL.CREATE_TABLE_USERS);
         db.execSQL(SQL.CREATE_TABLE_RECENT_UNLOCKS);
         db.execSQL(SQL.CREATE_TABLE_CRITICAL_ITEMS);
-        db.execSQL(SQL.CREATE_TABLE_STUDY_QUEUE);
         db.execSQL(SQL.CREATE_TABLE_LEVEL_PROGRESSION);
         db.execSQL(SQL.CREATE_TABLE_SRS);
         db.execSQL(SQL.CREATE_TABLE_NOTIFICATIONS);
         db.execSQL(SQL.CREATE_TABLE_SUMMARY);
         db.execSQL(SQL.CREATE_TABLE_LAST_UPDATED);
+        db.execSQL(SQL.CREATE_TABLE_ASSIGNMENTS);
     }
 
     @Override
@@ -48,11 +48,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         switch (oldVersion) {
             case 1:
                 db.execSQL(SQL.CREATE_TABLE_NOTIFICATIONS);
-                break;
             case 2:
                 db.execSQL(SQL.CREATE_TABLE_SUMMARY);
                 db.execSQL(SQL.DELETE_TABLE_STUDY_QUEUE);
                 db.execSQL(SQL.CREATE_TABLE_LAST_UPDATED);
+                db.execSQL(SQL.CREATE_TABLE_ASSIGNMENTS);
+                break;
         }
     }
 }

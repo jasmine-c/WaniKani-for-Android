@@ -16,8 +16,8 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import tr.xip.wanikani.BuildConfig;
 import tr.xip.wanikani.managers.PrefManager;
-import tr.xip.wanikani.models.v2.BaseResponse;
 import tr.xip.wanikani.models.v2.reviews.Assignment;
+import tr.xip.wanikani.models.v2.reviews.AssignmentCollection;
 import tr.xip.wanikani.models.v2.Collection;
 import tr.xip.wanikani.models.v2.reviews.Summary;
 import tr.xip.wanikani.models.v2.srs.LevelProgression;
@@ -81,19 +81,19 @@ public abstract class WaniKaniApiV2
         service = retrofit.create(WaniKaniServiceV2.class);
     }
 
-    public static Call<Collection<Resource<Assignment>>> getAssignments(Filter filters)
+    public static Call<AssignmentCollection> getAssignments(Filter filters)
     {
         return service.getAssignments(authorizationToken,
                 filters.filters);
     }
 
-    public static Call<Resource<Assignment>> getAssignment(int id)
+    public static Call<Assignment> getAssignment(int id)
     {
         return service.getAssignment(authorizationToken,
                 Integer.toString(id));
     }
 
-    public static Call<Resource<Assignment>> startAssignment(int id)
+    public static Call<Assignment> startAssignment(int id)
     {
         return service.startAssignment(authorizationToken,
                 Integer.toString(id));

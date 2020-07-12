@@ -11,8 +11,8 @@ import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.QueryMap;
-import tr.xip.wanikani.models.v2.BaseResponse;
 import tr.xip.wanikani.models.v2.reviews.Assignment;
+import tr.xip.wanikani.models.v2.reviews.AssignmentCollection;
 import tr.xip.wanikani.models.v2.Collection;
 import tr.xip.wanikani.models.v2.reviews.Summary;
 import tr.xip.wanikani.models.v2.srs.LevelProgression;
@@ -34,19 +34,19 @@ public interface WaniKaniServiceV2
 {
     @Headers({"Wanikani-Revision: 20170710"})
     @GET("assignments")
-    Call<Collection<Resource<Assignment>>> getAssignments(
+    Call<AssignmentCollection> getAssignments(
             @Header("Authorization") String api_key,
             @QueryMap Map<String, String> filters);
 
     @Headers({"Wanikani-Revision: 20170710"})
     @GET("assignments/{id}")
-    Call<Resource<Assignment>> getAssignment(
+    Call<Assignment> getAssignment(
             @Header("Authorization") String api_key,
             @Path("id") String id);
 
     @Headers({"Wanikani-Revision: 20170710"})
     @PUT("assignments/{id}/start")
-    Call<Resource<Assignment>> startAssignment(
+    Call<Assignment> startAssignment(
             @Header("Authorization") String api_key,
             @Path("id") String id);
 
