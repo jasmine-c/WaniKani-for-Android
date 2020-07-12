@@ -45,6 +45,20 @@ public class Summary extends BaseResponse<SummaryData> {
         return count;
     }
 
+    public int getNextHourReviewsCount()
+    {
+        return data.reviews.get(1).subject_ids.size();
+    }
+
+    public int getNextDayReviewsCount()
+    {
+        int count = 0;
+
+        for (int i = 1; i < data.reviews.size(); i++)
+            count += data.reviews.get(i).subject_ids.size();
+        return count;
+    }
+
     public long getNextReviewDateInMillis()
     {
         DateTime next = data.reviews.get(0).available_at;

@@ -132,8 +132,8 @@ public class ReviewsCard extends Fragment {
 
         DateTime now = DateTime.now();
 
-        mNextHour.setText(summary.getAvailableReviewsCount(now.plusHours(1)) + "");
-        mNextDay.setText(summary.getAvailableReviewsCount(now.plusDays(1)) + "");
+        mNextHour.setText(summary.getNextHourReviewsCount() + "");
+        mNextDay.setText(summary.getNextDayReviewsCount() + "");
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM HH:mm");
 
