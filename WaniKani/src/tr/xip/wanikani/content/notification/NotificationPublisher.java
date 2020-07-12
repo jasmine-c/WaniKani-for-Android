@@ -10,6 +10,8 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 
+import org.joda.time.DateTime;
+
 import retrofit2.Call;
 import retrofit2.Response;
 import tr.xip.wanikani.R;
@@ -17,12 +19,11 @@ import tr.xip.wanikani.app.activity.Browser;
 import tr.xip.wanikani.app.activity.MainActivity;
 import tr.xip.wanikani.app.activity.SWWebReviewActivity;
 import tr.xip.wanikani.app.activity.WebReviewActivity;
-import tr.xip.wanikani.client.WaniKaniApi;
-import tr.xip.wanikani.client.task.callback.ThroughDbCallback;
+import tr.xip.wanikani.client.task.callback.ThroughDbCallbackV2;
+import tr.xip.wanikani.client.v2.WaniKaniApiV2;
 import tr.xip.wanikani.database.DatabaseManager;
 import tr.xip.wanikani.managers.PrefManager;
-import tr.xip.wanikani.models.Request;
-import tr.xip.wanikani.models.StudyQueue;
+import tr.xip.wanikani.models.v2.reviews.Summary;
 
 /**
  * Created by Hikari on 12/16/14.
@@ -48,13 +49,13 @@ public class NotificationPublisher extends BroadcastReceiver {
         this.context = context;
         this.notifPrefs = new NotificationPreferences(context);
 
-        WaniKaniApi.getStudyQueue().enqueue(new ThroughDbCallback<Request<StudyQueue>, StudyQueue>() {
+        WaniKaniApiV2.getSummary().enqueue(new ThroughDbCallbackV2<Summary>() {
             @Override
-            public void onResponse(Call<Request<StudyQueue>> call, Response<Request<StudyQueue>> response) {
+            public void onResponse(Call<Summary> call, Response<Summary> response) {
                 super.onResponse(call, response);
 
-                if (response.isSuccessful() && response.body().requested_information != null) {
-                   load(response.body().requested_information);
+                if (response.isSuccessful() && response.body() != null) {
+                   load(response.body());
                 } else {
                     onFailure(call, null);
                 }
@@ -67,18 +68,19 @@ public class NotificationPublisher extends BroadcastReceiver {
             }
 
             @Override
-            public void onFailure(Call<Request<StudyQueue>> call, Throwable t) {
+            public void onFailure(Call<Summary> call, Throwable t) {
                 super.onFailure(call, t);
 
-                StudyQueue queue = DatabaseManager.getStudyQueue();
-                if (queue != null) {
-                    load(queue);
+                Summary summary = DatabaseManager.getSummary();
+                if (summary != null) {
+                    load(summary);
                 }
             }
 
-            void load(StudyQueue queue) {
-                int lessonsCount = queue.lessons_available;
-                int reviewsCount = queue.reviews_available;
+            void load(Summary summary) {
+                DateTime now = DateTime.now();
+                int lessonsCount = summary.getAvailableLessonsCount(now);
+                int reviewsCount = summary.getAvailableReviewsCount(now);
 
                 if (lessonsCount != 0 || reviewsCount != 0) {
                     NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context);

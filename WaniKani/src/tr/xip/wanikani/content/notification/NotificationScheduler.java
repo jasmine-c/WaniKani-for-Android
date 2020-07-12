@@ -11,11 +11,10 @@ import java.text.SimpleDateFormat;
 
 import retrofit2.Call;
 import retrofit2.Response;
-import tr.xip.wanikani.client.WaniKaniApi;
-import tr.xip.wanikani.client.task.callback.ThroughDbCallback;
+import tr.xip.wanikani.client.task.callback.ThroughDbCallbackV2;
+import tr.xip.wanikani.client.v2.WaniKaniApiV2;
 import tr.xip.wanikani.database.DatabaseManager;
-import tr.xip.wanikani.models.Request;
-import tr.xip.wanikani.models.StudyQueue;
+import tr.xip.wanikani.models.v2.reviews.Summary;
 
 public class NotificationScheduler {
     private Context context;
@@ -28,31 +27,31 @@ public class NotificationScheduler {
     }
 
     public void schedule() {
-        WaniKaniApi.getStudyQueue().enqueue(new ThroughDbCallback<Request<StudyQueue>, StudyQueue>() {
+        WaniKaniApiV2.getSummary().enqueue(new ThroughDbCallbackV2<Summary>() {
             @SuppressLint("SimpleDateFormat")
             @Override
-            public void onResponse(Call<Request<StudyQueue>> call, Response<Request<StudyQueue>> response) {
+            public void onResponse(Call<Summary> call, Response<Summary> response) {
                 super.onResponse(call, response);
 
-                if (response.isSuccessful() && response.body().requested_information != null) {
-                    load(response.body().requested_information);
+                if (response.isSuccessful() && response.body() != null) {
+                    load(response.body());
                 } else {
                     onFailure(call, null);
                 }
             }
 
             @Override
-            public void onFailure(Call<Request<StudyQueue>> call, Throwable t) {
+            public void onFailure(Call<Summary> call, Throwable t) {
                 super.onFailure(call, t);
 
-                StudyQueue queue = DatabaseManager.getStudyQueue();
-                if (queue != null) {
-                    load(queue);
+                Summary summary = DatabaseManager.getSummary();
+                if (summary != null) {
+                    load(summary);
                 }
             }
 
-            void load(StudyQueue queue) {
-                if (queue.getNextReviewDateInMillis() <= System.currentTimeMillis()) {
+            void load(Summary summary) {
+                if (summary.getNextReviewDateInMillis() <= System.currentTimeMillis()) {
                     new NotificationPublisher().publish(context);
                     return;
                 }
@@ -62,11 +61,11 @@ public class NotificationScheduler {
                     AlarmManager alarmManager = getAlarmManager();
                     alarmManager.set(
                             AlarmManager.RTC_WAKEUP,
-                            queue.getNextReviewDateInMillis() + NotificationPreferences.NOTIFICATION_CHECK_DELAY,
+                            summary.getNextReviewDateInMillis() + NotificationPreferences.NOTIFICATION_CHECK_DELAY,
                             pendingIntent
                     );
 
-                    Log.d("NOTIFICATION SCHEDULER", "SCHEDULED NOTIFICATION FOR " + new SimpleDateFormat("HH:mm:ss").format(queue.getNextReviewDateInMillis() + NotificationPreferences.NOTIFICATION_CHECK_DELAY));
+                    Log.d("NOTIFICATION SCHEDULER", "SCHEDULED NOTIFICATION FOR " + new SimpleDateFormat("HH:mm:ss").format(summary.getNextReviewDateInMillis() + NotificationPreferences.NOTIFICATION_CHECK_DELAY));
 
                     prefs.setAlarmSet(true);
                 }

@@ -4,9 +4,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import org.joda.time.DateTime;
+
 import tr.xip.wanikani.database.DatabaseManager;
 import tr.xip.wanikani.managers.PrefManager;
-import tr.xip.wanikani.models.StudyQueue;
+import tr.xip.wanikani.models.v2.reviews.Summary;
 
 /**
  * This receiver is called on every screen unlock. It schedules an alarm to set off on the next review
@@ -27,9 +29,9 @@ public class NotificationReceiver extends BroadcastReceiver {
         if (!PrefManager.isFirstLaunch() && PrefManager.notificationsEnabled()) {
             if (!prefs.isAlarmSet()) {
                 /** Schedule an alarm if none is scheduled yet */
-                StudyQueue queue = DatabaseManager.getStudyQueue();
+                Summary summary = DatabaseManager.getSummary();
                 //noinspection SimplifiableConditionalExpression
-                if (queue != null ? queue.reviews_available == 0 : true) {
+                if (summary != null ? summary.getAvailableReviewsCount(DateTime.now()) == 0 : true) {
                     new NotificationScheduler(context).schedule();
                 }
             }
