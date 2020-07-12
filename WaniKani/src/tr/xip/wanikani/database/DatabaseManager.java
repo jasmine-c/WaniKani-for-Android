@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.text.TextUtils;
 import android.util.Log;
 
 import org.joda.time.DateTime;
@@ -488,12 +489,14 @@ public class DatabaseManager {
 
         String ids = c.getString(c.getColumnIndexOrThrow(SummaryTable.COLUMN_NAME_SUBJECT_ID));
 
-        String[] idsArray = ids.split(",");
-
         ArrayList<Integer> intIds = new ArrayList<>();
 
-        for (String id : idsArray) {
-            intIds.add(Integer.parseInt(id));
+        if (!TextUtils.isEmpty(ids)) {
+            String[] idsArray = ids.split(",");
+
+            for (String id : idsArray) {
+                intIds.add(Integer.parseInt(id));
+            }
         }
 
         return new Lesson(availableAt, intIds);
