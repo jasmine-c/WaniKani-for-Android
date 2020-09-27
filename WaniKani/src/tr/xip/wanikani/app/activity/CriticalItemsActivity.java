@@ -52,49 +52,32 @@ public class CriticalItemsActivity extends AppCompatActivity {
         mGrid = (GridView) findViewById(R.id.activity_critical_items_grid);
         mFlipper = (ViewFlipper) findViewById(R.id.activity_critical_items_view_flipper);
 
-        WaniKaniApi.getCriticalItemsList(PrefManager.getDashboardCriticalItemsPercentage()).enqueue(new ThroughDbCallback<Request<CriticalItemsList>, CriticalItemsList>() {
-            @Override
-            public void onResponse(Call<Request<CriticalItemsList>> call, Response<Request<CriticalItemsList>> response) {
-                super.onResponse(call, response);
-                if (response.isSuccessful() && response.body().requested_information != null) {
-                    loadData(response.body().requested_information);
-                } else {
-                    onFailure(call, null);
-                }
-            }
+        CriticalItemsList list = DatabaseManager.getCriticalItems(PrefManager.getDashboardCriticalItemsPercentage());
 
-            @Override
-            public void onFailure(Call<Request<CriticalItemsList>> call, Throwable t) {
-                super.onFailure(call, t);
+        if (list != null) {
+            loadData(list);
+        } else {
+            Toast.makeText(getApplicationContext(), R.string.error_couldnt_load_data, Toast.LENGTH_SHORT).show();
+            finish();
+        }
+    }
 
-                CriticalItemsList list = DatabaseManager.getCriticalItems(PrefManager.getDashboardCriticalItemsPercentage());
+    private void loadData(CriticalItemsList list) {
+        mList = list;
 
-                if (list != null) {
-                    loadData(list);
-                } else {
-                    Toast.makeText(getApplicationContext(), R.string.error_couldnt_load_data, Toast.LENGTH_SHORT).show();
-                    finish();
-                }
-            }
+        mAdapter = new CriticalItemsGridAdapter(
+                CriticalItemsActivity.this,
+                R.layout.item_critical_grid,
+                mList
+        );
 
-            void loadData(CriticalItemsList list) {
-                mList = list;
+        mGrid.setAdapter(mAdapter);
 
-                mAdapter = new CriticalItemsGridAdapter(
-                        CriticalItemsActivity.this,
-                        R.layout.item_critical_grid,
-                        mList
-                );
+        mGrid.setOnItemClickListener(new GridItemClickListener());
 
-                mGrid.setAdapter(mAdapter);
-
-                mGrid.setOnItemClickListener(new GridItemClickListener());
-
-                if (mFlipper.getDisplayedChild() == 0) {
-                    mFlipper.showNext();
-                }
-            }
-        });
+        if (mFlipper.getDisplayedChild() == 0) {
+            mFlipper.showNext();
+        }
     }
 
     @Override

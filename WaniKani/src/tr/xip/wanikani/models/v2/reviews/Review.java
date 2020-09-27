@@ -1,10 +1,13 @@
 package tr.xip.wanikani.models.v2.reviews;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.joda.time.DateTime;
 
 import java.io.Serializable;
 
-public class Review extends ReviewCreate implements Serializable {
+import tr.xip.wanikani.models.Storable;
+
+public class Review extends ReviewCreate implements Serializable, Storable {
 
     private int ending_srs_stage;
     private int spaced_repetition_system_id;
@@ -18,5 +21,10 @@ public class Review extends ReviewCreate implements Serializable {
         this.ending_srs_stage = ending_srs_stage;
         this.spaced_repetition_system_id = spaced_repetition_system_id;
         this.starting_srs_stage = starting_srs_stage;
+    }
+
+    @Override
+    public void save() {
+        throw new NotImplementedException("save not implemented");
     }
 }

@@ -1,11 +1,13 @@
 package tr.xip.wanikani.models.v2.reviews;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.joda.time.DateTime;
 
 import java.io.Serializable;
 
-public class AssignmentData implements Serializable
-{
+import tr.xip.wanikani.models.Storable;
+
+public class AssignmentData implements Serializable, Storable {
     public int subject_id;
     public String subject_type;
     public int srs_stage;
@@ -33,5 +35,10 @@ public class AssignmentData implements Serializable
         this.available_at = available_at;
         this.resurrected_at = resurrected_at;
         this.hidden = hidden;
+    }
+
+    @Override
+    public void save() {
+        throw new NotImplementedException("save not implemented");
     }
 }

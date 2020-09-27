@@ -1,10 +1,13 @@
 package tr.xip.wanikani.models.v2.srs;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.joda.time.DateTime;
 
 import java.io.Serializable;
 
-public class LevelProgression implements Serializable {
+import tr.xip.wanikani.models.Storable;
+
+public class LevelProgression implements Serializable, Storable {
     private DateTime abandoned_at;
     private DateTime completed_at;
     private DateTime created_at;
@@ -23,5 +26,10 @@ public class LevelProgression implements Serializable {
         this.passed_at = passed_at;
         this.started_at = started_at;
         this.unlocked_at = unlocked_at;
+    }
+
+    @Override
+    public void save() {
+        throw new NotImplementedException("save not implemented");
     }
 }

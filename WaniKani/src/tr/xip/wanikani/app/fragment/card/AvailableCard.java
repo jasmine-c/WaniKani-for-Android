@@ -26,11 +26,12 @@ import tr.xip.wanikani.app.activity.Browser;
 import tr.xip.wanikani.app.activity.WebReviewActivity;
 import tr.xip.wanikani.app.fragment.DashboardFragment;
 import tr.xip.wanikani.client.WaniKaniApi;
-import tr.xip.wanikani.client.task.callback.ThroughDbCallbackV2;
-import tr.xip.wanikani.client.v2.WaniKaniApiV2;
+import tr.xip.wanikani.client.task.callback.ThroughDbCallback;
 import tr.xip.wanikani.content.receiver.BroadcastIntents;
 import tr.xip.wanikani.database.DatabaseManager;
 import tr.xip.wanikani.managers.PrefManager;
+import tr.xip.wanikani.models.Request;
+import tr.xip.wanikani.models.StudyQueue;
 import tr.xip.wanikani.models.User;
 import tr.xip.wanikani.models.v2.reviews.Summary;
 import tr.xip.wanikani.utils.Utils;
@@ -58,42 +59,21 @@ public class AvailableCard extends Fragment {
     private BroadcastReceiver mDoLoad = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            WaniKaniApiV2.getSummary().enqueue(new ThroughDbCallbackV2<Summary>() {
-                @Override
-                public void onResponse(Call<Summary> call, Response<Summary> response) {
-                    super.onResponse(call, response);
+            User user = DatabaseManager.getUser();
+            Summary summary = DatabaseManager.getSummary();
+            DateTime now = DateTime.now();
+            StudyQueue queue = new StudyQueue(0,
+                    summary.getAvailableLessonsCount(now),
+                    summary.getAvailableReviewsCount(now),
+                    summary.getNextHourReviewsCount(),
+                    summary.getNextDayReviewsCount(),
+                    summary.getNextReviewDateInMillis());
 
-                    if (response.isSuccessful() && response.body() != null) {
-                        try {
-                            User user = DatabaseManager.getUser();
-                            if (user == null) {
-                                user = WaniKaniApi.getUser().execute().body().requested_information;
-                                user.save();
-                            }
-                            displayData(DatabaseManager.getUser(), response.body());
-                        }
-                        catch (Exception e) {
-                            onFailure(call, e);
-                        }
-                    } else {
-                        onFailure(call, null);
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<Summary> call, Throwable t) {
-                    super.onFailure(call, t);
-
-                    User user = DatabaseManager.getUser();
-                    Summary summary = DatabaseManager.getSummary();
-
-                    if (user != null && summary != null) {
-                        displayData(user, summary);
-                    } else {
-                        mListener.onAvailableCardSyncFinishedListener(DashboardFragment.SYNC_RESULT_FAILED);
-                    }
-                }
-            });
+            if (user != null && queue != null) {
+                displayData(user, queue);
+            } else {
+                mListener.onAvailableCardSyncFinishedListener(DashboardFragment.SYNC_RESULT_FAILED);
+            }
         }
     };
 
@@ -157,12 +137,11 @@ public class AvailableCard extends Fragment {
         });
     }
 
-    private void displayData(User user, Summary summary) {
+    private void displayData(User user, StudyQueue queue) {
         if (!user.isVacationModeActive()) {
             if (isAdded()) {
-                DateTime now = DateTime.now();
-                int lessonsAvailable = summary.getAvailableLessonsCount(now);
-                int reviewsAvailable = summary.getAvailableReviewsCount(now);
+                int lessonsAvailable = queue.lessons_available;
+                int reviewsAvailable = queue.reviews_available;
                 Resources res = getResources();
                 mLessonsAvailable.setText(res.getQuantityString(R.plurals.card_content_available_lessons_capital, lessonsAvailable, lessonsAvailable));
                 mReviewsAvailable.setText(res.getQuantityString(R.plurals.card_content_available_reviews_capital, reviewsAvailable, reviewsAvailable));

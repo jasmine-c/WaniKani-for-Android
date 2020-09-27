@@ -5,6 +5,9 @@ import android.net.Uri;
 
 import retrofit2.Call;
 import retrofit2.Response;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.schedulers.Schedulers;
 import tr.xip.wanikani.client.v2.Filter;
 import tr.xip.wanikani.client.v2.WaniKaniApiV2;
 import tr.xip.wanikani.database.DatabaseManager;
@@ -23,7 +26,23 @@ public class AssignmentsCallback extends ThroughDbCallbackV2<AssignmentCollectio
     {
         WaniKaniApiV2.getAssignments(new Filter()
                 .updated_after(DatabaseManager.getLastUpdated(AssignmentsTable.TABLE_NAME)))
-                .enqueue(this);
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        new Action1<AssignmentCollection>() {
+                            @Override
+                            public void call(AssignmentCollection assignmentCollection) {
+                                onResponse(assignmentCollection);
+                            }
+                        },
+
+                        new Action1<Throwable>() {
+                            @Override
+                            public void call(Throwable throwable) {
+                                onFailure(throwable);
+                            }
+                        }
+                );
     }
 
     @Override
@@ -46,10 +65,74 @@ public class AssignmentsCallback extends ThroughDbCallbackV2<AssignmentCollectio
                 WaniKaniApiV2.getAssignments(new Filter()
                         .page_after_id(Integer.parseInt(url.getQueryParameter("page_after_id")))
                         .updated_after(DatabaseManager.getLastUpdated(AssignmentsTable.TABLE_NAME)))
-                        .enqueue(this);
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                                new Action1<AssignmentCollection>() {
+                                    @Override
+                                    public void call(AssignmentCollection assignmentCollection) {
+                                        onResponse(assignmentCollection);
+                                    }
+                                },
+
+                                new Action1<Throwable>() {
+                                    @Override
+                                    public void call(Throwable throwable) {
+                                        onFailure(throwable);
+                                    }
+                                }
+                        );
             }
         } else {
             onFailure(call, null);
+        }
+    }
+
+    private void onResponse(AssignmentCollection assignmentCollection)
+    {
+        if (assignmentCollection.pages.next_url == null)
+        {
+            DatabaseManager.saveLastUpdated(AssignmentsTable.TABLE_NAME, assignmentCollection.data_updated_at);
+
+            SRSDistribution distribution = DatabaseManager.getSrsDistribution();
+            if (distribution != null) {
+                callback.apply(distribution);
+            }
+        }
+        else
+        {
+            Uri url = Uri.parse(assignmentCollection.pages.next_url);
+
+            assignmentCollection.save();
+
+            WaniKaniApiV2.getAssignments(new Filter()
+                    .page_after_id(Integer.parseInt(url.getQueryParameter("page_after_id")))
+                    .updated_after(DatabaseManager.getLastUpdated(AssignmentsTable.TABLE_NAME)))
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(
+                            new Action1<AssignmentCollection>() {
+                                @Override
+                                public void call(AssignmentCollection assignmentCollection) {
+                                    onResponse(assignmentCollection);
+                                }
+                            },
+
+                            new Action1<Throwable>() {
+                                @Override
+                                public void call(Throwable throwable) {
+                                    onFailure(throwable);
+                                }
+                            }
+                    );
+        }
+    }
+
+    private void onFailure(Throwable t)
+    {
+        SRSDistribution distribution = DatabaseManager.getSrsDistribution();
+        if (distribution != null) {
+            callback.apply(distribution);
         }
     }
 

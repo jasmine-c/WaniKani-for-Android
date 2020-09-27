@@ -21,8 +21,13 @@ import android.widget.LinearLayout;
 import java.io.Serializable;
 import java.util.List;
 
+import rx.Completable;
+import rx.Observable;
+import rx.functions.Action0;
+import rx.functions.Action1;
+import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 import tr.xip.wanikani.R;
-import tr.xip.wanikani.app.activity.MainActivity;
 import tr.xip.wanikani.app.activity.ProgressDetailsActivity;
 import tr.xip.wanikani.app.fragment.card.AvailableCard;
 import tr.xip.wanikani.app.fragment.card.CriticalItemsCard;
@@ -33,11 +38,17 @@ import tr.xip.wanikani.app.fragment.card.RecentUnlocksCard;
 import tr.xip.wanikani.app.fragment.card.ReviewsCard;
 import tr.xip.wanikani.app.fragment.card.SRSCard;
 import tr.xip.wanikani.app.fragment.card.VacationModeCard;
+import tr.xip.wanikani.client.v2.DataUpdater;
+import tr.xip.wanikani.client.v2.Filter;
+import tr.xip.wanikani.client.v2.WaniKaniApiV2;
 import tr.xip.wanikani.content.receiver.BroadcastIntents;
 import tr.xip.wanikani.database.DatabaseManager;
 import tr.xip.wanikani.managers.PrefManager;
 import tr.xip.wanikani.models.Notification;
 import tr.xip.wanikani.models.User;
+import tr.xip.wanikani.models.v2.Resource;
+import tr.xip.wanikani.models.v2.reviews.AssignmentCollection;
+import tr.xip.wanikani.models.v2.reviews.Summary;
 
 public class DashboardFragment extends Fragment
         implements SwipeRefreshLayout.OnRefreshListener,
@@ -174,22 +185,58 @@ public class DashboardFragment extends Fragment
         transaction.replace(R.id.fragment_dashboard_critical_items_card, criticalItemsCard);
         transaction.commit();
 
-        if (!MainActivity.isFirstSyncDashboardDone) {
-            Intent intent = new Intent(BroadcastIntents.SYNC());
-            LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(intent);
-            checkVacationMode();
-            MainActivity.isFirstSyncDashboardDone = true;
-        } else {
-            Intent intent = new Intent(BroadcastIntents.SYNC());
-            LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(intent);
-            checkVacationMode();
-        }
-
-        showNotificationIfExists();
-
+        sync();
         setRefreshing();
 
         return rootView;
+    }
+
+    private void sync() {
+        showNotificationIfExists();
+
+        Completable.merge(
+//                WaniKaniApiV2.getReviews(new Filter()).toCompletable(),
+//                WaniKaniApiV2.getLevelProgressions(new Filter()).toCompletable(),
+//                WaniKaniApiV2.getResets(new Filter()).toCompletable(),
+//                WaniKaniApiV2.getReviewStatistics(new Filter()).toCompletable(),
+//                WaniKaniApiV2.getSpacedRepetitionSystems(new Filter()).toCompletable(),
+//                WaniKaniApiV2.getStudyMaterials(new Filter()).toCompletable(),
+//                WaniKaniApiV2.getVoiceActors(new Filter()).toCompletable(),
+//                WaniKaniApiV2.getSubjects(new Filter()).toCompletable()
+                new DataUpdater(new Func1<Filter, Observable<Resource<tr.xip.wanikani.models.v2.user.User>>>() {
+                    @Override
+                    public Observable<Resource<tr.xip.wanikani.models.v2.user.User>> call(Filter filter) {
+                        return WaniKaniApiV2.getUser();
+                    }
+                }, "user").updateData(),
+                new DataUpdater(new Func1<Filter, Observable<AssignmentCollection>>() {
+                    @Override
+                    public Observable<AssignmentCollection> call(Filter filter) {
+                        return WaniKaniApiV2.getAssignments(filter);
+                    }
+                }, "assignments").updateData(),
+                new DataUpdater(new Func1<Filter, Observable<Summary>>() {
+                    @Override
+                    public Observable<Summary> call(Filter filter) {
+                        return WaniKaniApiV2.getSummary();
+                    }
+                }, "summary").updateData()
+        )
+        .subscribeOn(Schedulers.io())
+        .observeOn(Schedulers.io())
+        .subscribe(new Action0() {
+            @Override
+            public void call() {
+                Intent intent = new Intent(BroadcastIntents.SYNC());
+                LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(intent);
+                checkVacationMode();
+            }
+        }, new Action1<Throwable>() {
+            @Override
+            public void call(Throwable throwable) {
+                showMessage(MESSAGE_TYPE.ERROR_UNKNOWN);
+            }
+        });
     }
 
     private void setRefreshing() {
@@ -412,11 +459,7 @@ public class DashboardFragment extends Fragment
         isRecentUnlocksCardSyncedSuccess = false;
         isCriticalItemsCardSyncedSuccess = false;
 
-        showNotificationIfExists();
-
-        Intent intent = new Intent(BroadcastIntents.SYNC());
-        LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(intent);
-        checkVacationMode();
+        sync();
     }
 
     @Override

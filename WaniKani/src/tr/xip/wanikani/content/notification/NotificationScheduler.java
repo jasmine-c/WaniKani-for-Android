@@ -27,7 +27,7 @@ public class NotificationScheduler {
     }
 
     public void schedule() {
-        WaniKaniApiV2.getSummary().enqueue(new ThroughDbCallbackV2<Summary>() {
+        /*WaniKaniApiV2.getSummary().enqueue(new ThroughDbCallbackV2<Summary>() {
             @SuppressLint("SimpleDateFormat")
             @Override
             public void onResponse(Call<Summary> call, Response<Summary> response) {
@@ -70,7 +70,7 @@ public class NotificationScheduler {
                     prefs.setAlarmSet(true);
                 }
             }
-        });
+        });*/
     }
 
     public void cancelNotifications() {

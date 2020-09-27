@@ -506,7 +506,7 @@ public class DatabaseManager {
     private static Lesson getLesson(Cursor c)
     {
         DateTime availableAt = new DateTime(
-                c.getInt(c.getColumnIndexOrThrow(SummaryTable.COLUMN_NAME_AVAILABLE_AT)));
+                c.getLong(c.getColumnIndexOrThrow(SummaryTable.COLUMN_NAME_AVAILABLE_AT)));
 
         String ids = c.getString(c.getColumnIndexOrThrow(SummaryTable.COLUMN_NAME_SUBJECT_ID));
 

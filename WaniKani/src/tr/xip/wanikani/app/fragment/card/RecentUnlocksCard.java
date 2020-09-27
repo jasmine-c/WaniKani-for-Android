@@ -68,30 +68,10 @@ public class RecentUnlocksCard extends Fragment {
     private BroadcastReceiver mDoLoad = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            mContext = context;
-
-            WaniKaniApi.getRecentUnlocksList(PrefManager.getDashboardRecentUnlocksNumber()).enqueue(new ThroughDbCallback<Request<RecentUnlocksList>, RecentUnlocksList>() {
-                @Override
-                public void onResponse(Call<Request<RecentUnlocksList>> call, Response<Request<RecentUnlocksList>> response) {
-                    super.onResponse(call, response);
-
-                    if (response.isSuccessful()) {
-                        displaydata(response.body().requested_information);
-                    } else {
-                        onFailure(call, null);
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<Request<RecentUnlocksList>> call, Throwable t) {
-                    super.onFailure(call, t);
-
-                    RecentUnlocksList list = DatabaseManager.getRecentUnlocks(PrefManager.getDashboardRecentUnlocksNumber());
-                    if (list != null) {
-                        displaydata(list);
-                    }
-                }
-            });
+        RecentUnlocksList list = DatabaseManager.getRecentUnlocks(PrefManager.getDashboardRecentUnlocksNumber());
+        if (list != null) {
+            displaydata(list);
+        }
         }
     };
 

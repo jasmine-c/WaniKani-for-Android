@@ -4,14 +4,17 @@ import org.joda.time.DateTime;
 
 import java.io.Serializable;
 
-public class User implements Serializable {
-    private DateTime current_vacation_started_at;
-    private int level;
-    private Preferences preferences;
-    private String profile_url;
-    private DateTime started_at;
-    private Subscription subscription;
-    private String username;
+import tr.xip.wanikani.database.DatabaseManager;
+import tr.xip.wanikani.models.Storable;
+
+public class User implements Serializable, Storable {
+    public DateTime current_vacation_started_at;
+    public int level;
+    public Preferences preferences;
+    public String profile_url;
+    public DateTime started_at;
+    public Subscription subscription;
+    public String username;
 
     public User(
             DateTime current_vacation_started_at, int level, Preferences preferences,
@@ -23,5 +26,15 @@ public class User implements Serializable {
         this.started_at = started_at;
         this.subscription = subscription;
         this.username = username;
+    }
+
+    @Override
+    public void save() {
+        DatabaseManager.saveUser(
+                new tr.xip.wanikani.models.User(username, null, level,
+                        "", "", "", "", 0, 0,
+                        started_at.getMillis() / 1000,
+                        current_vacation_started_at == null ?
+                                0 : current_vacation_started_at.getMillis() / 1000));
     }
 }

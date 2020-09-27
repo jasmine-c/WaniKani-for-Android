@@ -96,33 +96,14 @@ public class ProgressCard extends Fragment {
     }
 
     public void load() {
-        WaniKaniApi.getLevelProgression().enqueue(new ThroughDbCallback<Request<LevelProgression>, LevelProgression>() {
-            @SuppressLint("SetTextI18n")
-            @Override
-            public void onResponse(Call<Request<LevelProgression>> call, Response<Request<LevelProgression>> response) {
-                super.onResponse(call, response);
+        User user = DatabaseManager.getUser();
+        LevelProgression progression = DatabaseManager.getLevelProgression();
 
-                if (response.isSuccessful() && response.body().requested_information != null && response.body().user_information != null) {
-                    displayData(response.body().user_information, response.body().requested_information);
-                } else {
-                    onFailure(call, null);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Request<LevelProgression>> call, Throwable t) {
-                super.onFailure(call, t);
-
-                User user = DatabaseManager.getUser();
-                LevelProgression progression = DatabaseManager.getLevelProgression();
-
-                if (user != null && progression != null) {
-                    displayData(user, progression);
-                } else {
-                    mListener.onProgressCardSyncFinishedListener(DashboardFragment.SYNC_RESULT_FAILED);
-                }
-            }
-        });
+        if (user != null && progression != null) {
+            displayData(user, progression);
+        } else {
+            mListener.onProgressCardSyncFinishedListener(DashboardFragment.SYNC_RESULT_FAILED);
+        }
     }
 
     @SuppressLint("SetTextI18n")

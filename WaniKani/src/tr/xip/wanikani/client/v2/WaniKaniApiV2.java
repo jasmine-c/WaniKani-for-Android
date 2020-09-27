@@ -1,32 +1,41 @@
 package tr.xip.wanikani.client.v2;
 
+import android.net.Uri;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
-import java.lang.reflect.Type;
+
 import org.joda.time.DateTime;
+
+import java.lang.reflect.Type;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
-import retrofit2.Call;
 import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
+import rx.Observable;
+import rx.functions.Func1;
+import rx.functions.Func2;
 import tr.xip.wanikani.BuildConfig;
+import tr.xip.wanikani.database.DatabaseManager;
+import tr.xip.wanikani.database.v2.AssignmentsTable;
 import tr.xip.wanikani.managers.PrefManager;
+import tr.xip.wanikani.models.v2.Collection;
+import tr.xip.wanikani.models.v2.Resource;
 import tr.xip.wanikani.models.v2.reviews.Assignment;
 import tr.xip.wanikani.models.v2.reviews.AssignmentCollection;
-import tr.xip.wanikani.models.v2.Collection;
-import tr.xip.wanikani.models.v2.reviews.Summary;
-import tr.xip.wanikani.models.v2.srs.LevelProgression;
-import tr.xip.wanikani.models.v2.srs.Reset;
-import tr.xip.wanikani.models.v2.Resource;
 import tr.xip.wanikani.models.v2.reviews.Review;
 import tr.xip.wanikani.models.v2.reviews.ReviewCreate;
 import tr.xip.wanikani.models.v2.reviews.ReviewCreateResponse;
 import tr.xip.wanikani.models.v2.reviews.ReviewStatistic;
+import tr.xip.wanikani.models.v2.reviews.Summary;
+import tr.xip.wanikani.models.v2.srs.LevelProgression;
+import tr.xip.wanikani.models.v2.srs.Reset;
 import tr.xip.wanikani.models.v2.srs.SpacedRepetitionSystem;
 import tr.xip.wanikani.models.v2.subjects.StudyMaterial;
 import tr.xip.wanikani.models.v2.subjects.StudyMaterialCreate;
@@ -62,7 +71,8 @@ public abstract class WaniKaniApiV2
             clientBuilder.addInterceptor(httpLoggingInterceptor);
         }
 
-        Gson gson = new GsonBuilder().registerTypeAdapter(DateTime.class, new JsonDeserializer<DateTime>() {
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(DateTime.class, new JsonDeserializer<DateTime>() {
             @Override
             public DateTime deserialize(
                     JsonElement json, Type type, JsonDeserializationContext jsonDeserializationContext)
@@ -70,10 +80,18 @@ public abstract class WaniKaniApiV2
             {
                 return DateTime.parse(json.getAsJsonPrimitive().getAsString());
             }
-        }).create();
+        })
+                .registerTypeAdapter(Subject.class, new JsonDeserializer<Subject>() {
+                    @Override
+                    public Subject deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+                        return Subject.ParseSubject(json, context);
+                    }
+                })
+                .create();
 
         Retrofit retrofit = new Retrofit.Builder()
                 .client(clientBuilder.build())
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .baseUrl("https://api.wanikani.com/v2/")
                 .build();
@@ -81,149 +99,172 @@ public abstract class WaniKaniApiV2
         service = retrofit.create(WaniKaniServiceV2.class);
     }
 
-    public static Call<AssignmentCollection> getAssignments(Filter filters)
+    public static Observable<AssignmentCollection> getAssignments(final Filter filters)
     {
-        return service.getAssignments(authorizationToken,
-                filters.filters);
+        return service.getAssignments(authorizationToken, filters.filters)
+            .concatMap(new Func1<AssignmentCollection, Observable<AssignmentCollection>>() {
+
+                @Override
+                public Observable<AssignmentCollection> call(AssignmentCollection response) {
+                    // Terminal case.
+                    if (response.pages.next_url == null) {
+                        return Observable.just(response);
+                    }
+
+                    Uri url = Uri.parse(response.pages.next_url);
+
+                    return Observable.just(response)
+                            .concatWith(getAssignments(new Filter()
+                                    .page_after_id(Integer.parseInt(url.getQueryParameter("page_after_id")))
+                                    .updated_after(DatabaseManager.getLastUpdated(AssignmentsTable.TABLE_NAME))));
+                }
+            })
+            .reduce(new Func2<AssignmentCollection, AssignmentCollection, AssignmentCollection>() {
+                @Override
+                public AssignmentCollection call(AssignmentCollection assignmentCollection, AssignmentCollection assignmentCollection2) {
+                    assignmentCollection.data.addAll(assignmentCollection2.data);
+                    return assignmentCollection;
+                }
+            });
     }
 
-    public static Call<Assignment> getAssignment(int id)
+    public static Observable<Assignment> getAssignment(int id)
     {
         return service.getAssignment(authorizationToken,
                 Integer.toString(id));
     }
 
-    public static Call<Assignment> startAssignment(int id)
+    public static Observable<Assignment> startAssignment(int id)
     {
         return service.startAssignment(authorizationToken,
                 Integer.toString(id));
     }
 
-    public static Call<Collection<Resource<LevelProgression>>> getLevelProgressions(Filter filters)
+    public static Observable<Collection<Resource<LevelProgression>>> getLevelProgressions(Filter filters)
     {
         return service.getLevelProgressions(authorizationToken,
                 filters.filters);
     }
 
-    public static Call<Resource<LevelProgression>> getLevelProgression(int id)
+    public static Observable<Resource<LevelProgression>> getLevelProgression(int id)
     {
         return service.getLevelProgression(authorizationToken,
                 Integer.toString(id));
     }
 
-    public static Call<Collection<Resource<Reset>>> getResets(Filter filters)
+    public static Observable<Collection<Resource<Reset>>> getResets(Filter filters)
     {
         return service.getResets(authorizationToken,
                 filters.filters);
     }
 
-    public static Call<Resource<Reset>> getReset(int id)
+    public static Observable<Resource<Reset>> getReset(int id)
     {
         return service.getReset(authorizationToken,
                 Integer.toString(id));
     }
 
-    public static Call<Collection<Resource<Review>>> getReviews(Filter filters)
+    public static Observable<Collection<Resource<Review>>> getReviews(Filter filters)
     {
         return service.getReviews(authorizationToken,
                 filters.filters);
     }
 
-    public static Call<Resource<Review>> getReview(int id)
+    public static Observable<Resource<Review>> getReview(int id)
     {
         return service.getReview(authorizationToken,
                 Integer.toString(id));
     }
 
-    public static Call<Resource<ReviewCreateResponse>> createReview(ReviewCreate review)
+    public static Observable<Resource<ReviewCreateResponse>> createReview(ReviewCreate review)
     {
         return service.createReview(authorizationToken, review);
     }
 
-    public static Call<Collection<Resource<ReviewStatistic>>> getReviewStatistics(Filter filters)
+    public static Observable<Collection<Resource<ReviewStatistic>>> getReviewStatistics(Filter filters)
     {
         return service.getReviewStatistics(authorizationToken,
                 filters.filters);
     }
 
-    public static Call<Resource<ReviewStatistic>> getReviewStatistic(int id)
+    public static Observable<Resource<ReviewStatistic>> getReviewStatistic(int id)
     {
         return service.getReviewStatistic(authorizationToken,
                 Integer.toString(id));
     }
 
-    public static Call<Collection<Resource<SpacedRepetitionSystem>>> getSpacedRepetitionSystems(
+    public static Observable<Collection<Resource<SpacedRepetitionSystem>>> getSpacedRepetitionSystems(
             Filter filters)
     {
         return service.getSpacedRepetitionSystems(authorizationToken,
             filters.filters);
     }
 
-    public static Call<Resource<SpacedRepetitionSystem>> getSpacedRepetitionSystem(int id)
+    public static Observable<Resource<SpacedRepetitionSystem>> getSpacedRepetitionSystem(int id)
     {
         return service.getSpacedRepetitionSystem(authorizationToken,
                 Integer.toString(id));
     }
 
-    public static Call<Collection<Resource<StudyMaterial>>> getStudyMaterials(Filter filters)
+    public static Observable<Collection<Resource<StudyMaterial>>> getStudyMaterials(Filter filters)
     {
         return service.getStudyMaterials(authorizationToken,
                 filters.filters);
     }
 
-    public static Call<Resource<StudyMaterial>> getStudyMaterial(int id)
+    public static Observable<Resource<StudyMaterial>> getStudyMaterial(int id)
     {
         return service.getStudyMaterial(authorizationToken,
                 Integer.toString(id));
     }
 
-    public static Call<Resource<StudyMaterial>> createStudyMaterial(StudyMaterialCreate studyMaterial)
+    public static Observable<Resource<StudyMaterial>> createStudyMaterial(StudyMaterialCreate studyMaterial)
     {
         return service.createStudyMaterial(authorizationToken,
                 studyMaterial);
     }
 
-    public static Call<Resource<StudyMaterial>> updateStudyMaterial(
+    public static Observable<Resource<StudyMaterial>> updateStudyMaterial(
             int id, StudyMaterialCreate studyMaterial)
     {
         return service.updateStudyMaterial(authorizationToken,
                 Integer.toString(id), studyMaterial);
     }
 
-    public static Call<Collection<Resource<Subject>>> getSubjects(Filter filters)
+    public static Observable<Collection<Subject>> getSubjects(Filter filters)
     {
         return service.getSubjects(authorizationToken,
                 filters.filters);
     }
 
-    public static Call<Resource<Subject>> getSubject(int id)
+    public static Observable<Subject> getSubject(int id)
     {
         return service.getSubject(authorizationToken,
                 Integer.toString(id));
     }
 
-    public static Call<Summary> getSummary()
+    public static Observable<Summary> getSummary()
     {
         return service.getSummary(authorizationToken);
     }
 
-    public static Call<Resource<User>> getUser()
+    public static Observable<Resource<User>> getUser()
     {
         return service.getUser(authorizationToken);
     }
 
-    public static Call<Resource<User>> updateUser(UserUpdateRequest update)
+    public static Observable<Resource<User>> updateUser(UserUpdateRequest update)
     {
         return service.updateUser(authorizationToken, update);
     }
 
-    public static Call<Collection<Resource<VoiceActor>>> getVoiceActors(Filter filters)
+    public static Observable<Collection<Resource<VoiceActor>>> getVoiceActors(Filter filters)
     {
         return service.getVoiceActors(authorizationToken,
                 filters.filters);
     }
 
-    public static Call<Resource<VoiceActor>> getVoiceActor(int id)
+    public static Observable<Resource<VoiceActor>> getVoiceActor(int id)
     {
         return service.getVoiceActor(authorizationToken,
                 Integer.toString(id));

@@ -1,10 +1,13 @@
 package tr.xip.wanikani.models.v2.reviews;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.joda.time.DateTime;
 
 import java.io.Serializable;
 
-public class ReviewStatistic implements Serializable {
+import tr.xip.wanikani.models.Storable;
+
+public class ReviewStatistic implements Serializable, Storable {
     private DateTime created_at;
     private boolean hidden;
     private int meaning_correct;
@@ -37,5 +40,10 @@ public class ReviewStatistic implements Serializable {
         this.reading_max_streak = reading_max_streak;
         this.subject_id = subject_id;
         this.subject_type = subject_type;
+    }
+
+    @Override
+    public void save() {
+        throw new NotImplementedException("save not implemented");
     }
 }

@@ -1,11 +1,14 @@
 package tr.xip.wanikani.models.v2.subjects;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.joda.time.DateTime;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 
-public class StudyMaterial extends StudyMaterialCreate implements Serializable {
+import tr.xip.wanikani.models.Storable;
+
+public class StudyMaterial extends StudyMaterialCreate implements Serializable, Storable {
     private DateTime created_at;
     private boolean hidden;
     private String subject_type;
@@ -18,5 +21,10 @@ public class StudyMaterial extends StudyMaterialCreate implements Serializable {
         this.created_at = created_at;
         this.hidden = hidden;
         this.subject_type = subject_type;
+    }
+
+    @Override
+    public void save() {
+        throw new NotImplementedException("save not implemented");
     }
 }

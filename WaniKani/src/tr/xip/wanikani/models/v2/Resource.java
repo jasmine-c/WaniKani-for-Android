@@ -5,7 +5,9 @@ import org.joda.time.DateTime;
 
 import java.io.Serializable;
 
-public class Resource<T> extends BaseResponse<T> implements Serializable
+import tr.xip.wanikani.models.Storable;
+
+public class Resource<T extends Storable> extends BaseResponse<T> implements Serializable
 {
     private int id;
 
@@ -17,6 +19,6 @@ public class Resource<T> extends BaseResponse<T> implements Serializable
 
     @Override
     public void save() {
-        throw new NotImplementedException("Implement save!!");
+        data.save();
     }
 }

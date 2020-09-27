@@ -74,28 +74,8 @@ public class CriticalItemsCard extends Fragment {
     private BroadcastReceiver mDoLoad = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            mContext = context;
-
-            WaniKaniApi.getCriticalItemsList(PrefManager.getDashboardCriticalItemsPercentage()).enqueue(new ThroughDbCallback<Request<CriticalItemsList>, CriticalItemsList>() {
-                @Override
-                public void onResponse(Call<Request<CriticalItemsList>> call, Response<Request<CriticalItemsList>> response) {
-                    super.onResponse(call, response);
-
-                    if (response.isSuccessful()) {
-                        displayData(response.body().requested_information);
-                    } else {
-                        onFailure(call, null);
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<Request<CriticalItemsList>> call, Throwable t) {
-                    super.onFailure(call, t);
-
-                    CriticalItemsList list = DatabaseManager.getCriticalItems(PrefManager.getDashboardCriticalItemsPercentage());
-                    displayData(list);
-                }
-            });
+//        CriticalItemsList list = DatabaseManager.getCriticalItems(PrefManager.getDashboardCriticalItemsPercentage());
+//        displayData(list);
         }
     };
 

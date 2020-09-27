@@ -1,12 +1,13 @@
 package tr.xip.wanikani.app.fragment.card;
 
 import android.annotation.SuppressLint;
-import android.arch.core.util.Function;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.PorterDuff;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
@@ -19,10 +20,16 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.ViewFlipper;
 
+import retrofit2.Call;
+import retrofit2.Response;
 import tr.xip.wanikani.R;
 import tr.xip.wanikani.app.fragment.DashboardFragment;
-import tr.xip.wanikani.client.task.callback.AssignmentsCallback;
+import tr.xip.wanikani.client.WaniKaniApi;
+import tr.xip.wanikani.client.task.callback.ThroughDbCallback;
 import tr.xip.wanikani.content.receiver.BroadcastIntents;
+import tr.xip.wanikani.database.DatabaseManager;
+import tr.xip.wanikani.models.LevelProgression;
+import tr.xip.wanikani.models.Request;
 import tr.xip.wanikani.models.SRSDistribution;
 import tr.xip.wanikani.utils.Utils;
 
@@ -80,13 +87,11 @@ public class SRSCard extends Fragment {
     private BroadcastReceiver mDoLoad = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            new AssignmentsCallback(new Function<SRSDistribution, Void>() {
-                @Override
-                public Void apply(SRSDistribution input) {
-                    displayData(input);
-                    return null;
-                }
-            }).enqueueQuery();
+            SRSDistribution distribution = DatabaseManager.getSrsDistribution();
+            
+            if (distribution != null) {
+                displayData(distribution);
+            }
         }
     };
 

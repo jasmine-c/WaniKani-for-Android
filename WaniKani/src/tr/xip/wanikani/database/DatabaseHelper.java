@@ -20,6 +20,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // don't accidentally leak an Activity's context.
         // See this article for more information: http://bit.ly/6LRzfx
         if (mInstance == null) {
+            ctx.deleteDatabase(DATABASE_NAME);
             mInstance = new DatabaseHelper(ctx.getApplicationContext());
         }
         return mInstance;

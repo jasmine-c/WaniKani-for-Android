@@ -49,7 +49,7 @@ public class NotificationPublisher extends BroadcastReceiver {
         this.context = context;
         this.notifPrefs = new NotificationPreferences(context);
 
-        WaniKaniApiV2.getSummary().enqueue(new ThroughDbCallbackV2<Summary>() {
+        /*WaniKaniApiV2.getSummary().enqueue(new ThroughDbCallbackV2<Summary>() {
             @Override
             public void onResponse(Call<Summary> call, Response<Summary> response) {
                 super.onResponse(call, response);
@@ -90,7 +90,7 @@ public class NotificationPublisher extends BroadcastReceiver {
                             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                             .setAutoCancel(true);
 
-                    /** We have both lessons and reviews */
+                    *//** We have both lessons and reviews *//*
                     if (lessonsCount != 0 && reviewsCount != 0) {
                         mBuilder.setContentTitle(getString(R.string.notif_title_new_lessons_and_reviews));
 
@@ -111,13 +111,13 @@ public class NotificationPublisher extends BroadcastReceiver {
                                 .addAction(mReviewsAction);
                     }
 
-                    /** We only have lessons */
+                    *//** We only have lessons *//*
                     if (lessonsCount != 0 && reviewsCount == 0) {
                         mBuilder.setContentTitle(getString(R.string.notif_title_new_lessons));
                         mBuilder.setContentIntent(getBrowserPendingIntent(BROWSER_TYPE_LESSONS));
                     }
 
-                    /** We only have reviews */
+                    *//** We only have reviews *//*
                     if (reviewsCount != 0 && lessonsCount == 0) {
                         mBuilder.setContentTitle(getString(R.string.notif_title_new_reviews));
                         mBuilder.setContentIntent(getBrowserPendingIntent(BROWSER_TYPE_REVIEWS));
@@ -130,7 +130,7 @@ public class NotificationPublisher extends BroadcastReceiver {
                     mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
                 }
             }
-        });
+        });*/
     }
 
     private String getString(int res) {

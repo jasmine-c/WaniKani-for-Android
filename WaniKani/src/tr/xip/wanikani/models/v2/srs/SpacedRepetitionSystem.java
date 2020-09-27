@@ -1,11 +1,14 @@
 package tr.xip.wanikani.models.v2.srs;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.joda.time.DateTime;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 
-public class SpacedRepetitionSystem implements Serializable {
+import tr.xip.wanikani.models.Storable;
+
+public class SpacedRepetitionSystem implements Serializable, Storable {
     private int burning_stage_position;
     private DateTime created_at;
     private String description;
@@ -27,5 +30,10 @@ public class SpacedRepetitionSystem implements Serializable {
         this.stages = stages;
         this.starting_stage_position = starting_stage_position;
         this.unlocking_stage_position = unlocking_stage_position;
+    }
+
+    @Override
+    public void save() {
+        throw new NotImplementedException("save not implemented");
     }
 }
