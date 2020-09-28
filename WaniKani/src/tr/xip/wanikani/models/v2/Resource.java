@@ -9,7 +9,7 @@ import tr.xip.wanikani.models.Storable;
 
 public class Resource<T extends Storable> extends BaseResponse<T> implements Serializable
 {
-    private int id;
+    public int id;
 
     public Resource(int id, String object, String url, DateTime data_updated_at, T data)
     {

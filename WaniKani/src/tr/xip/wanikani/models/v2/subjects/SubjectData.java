@@ -10,17 +10,17 @@ import tr.xip.wanikani.models.Storable;
 import tr.xip.wanikani.models.v2.Resource;
 
 public abstract class SubjectData implements Serializable, Storable {
-    private ArrayList<AuxiliaryMeaning> auxiliary_meanings;
-    private String characters;
-    private DateTime created_at;
-    private String document_url;
-    private DateTime hidden_at;
-    private int lesson_position;
-    private int level;
-    private String meaning_mnemonic;
-    private ArrayList<Meaning> meanings;
-    private String slug;
-    private int spaced_repetition_system_id;
+    public ArrayList<AuxiliaryMeaning> auxiliary_meanings;
+    public String characters;
+    public DateTime created_at;
+    public String document_url;
+    public DateTime hidden_at;
+    public int lesson_position;
+    public int level;
+    public String meaning_mnemonic;
+    public ArrayList<Meaning> meanings;
+    public String slug;
+    public int spaced_repetition_system_id;
 
     public SubjectData(
             ArrayList<AuxiliaryMeaning> auxiliary_meanings, String characters, DateTime created_at,

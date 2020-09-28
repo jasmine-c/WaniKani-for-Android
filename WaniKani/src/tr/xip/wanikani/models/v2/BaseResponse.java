@@ -8,8 +8,8 @@ import tr.xip.wanikani.models.Storable;
 
 public abstract class BaseResponse<T> implements Serializable, Storable
 {
-    protected String object;
-    protected String url;
+    public String object;
+    public String url;
     public DateTime data_updated_at;
     public T data;
 

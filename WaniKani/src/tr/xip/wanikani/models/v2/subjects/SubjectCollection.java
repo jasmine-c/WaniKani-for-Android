@@ -16,6 +16,6 @@ public class SubjectCollection extends Collection<Subject> implements Storable {
 
     @Override
     public void save() {
-
+        DatabaseManager.saveSubjects(this.data);
     }
 }

@@ -10,6 +10,7 @@ import tr.xip.wanikani.database.table.StudyQueueTable;
 import tr.xip.wanikani.database.table.UsersTable;
 import tr.xip.wanikani.database.v2.AssignmentsTable;
 import tr.xip.wanikani.database.v2.LastUpdatedTable;
+import tr.xip.wanikani.database.v2.SubjectsTable;
 import tr.xip.wanikani.database.v2.SummaryTable;
 
 public class SQL {
@@ -21,223 +22,255 @@ public class SQL {
     public static final String COMMA_SEP = ", ";
 
     public static final String CREATE_TABLE_ITEMS = "CREATE TABLE "
-            + ItemsTable.TABLE_NAME + " ("
-            + ItemsTable.COLUMN_NAME_ID + INTEGER_PRIMARY_KEY_AUTOINCREMENT + COMMA_SEP
-            + ItemsTable.COLUMN_NAME_CHARACTER + TEXT_TYPE + COMMA_SEP
-            + ItemsTable.COLUMN_NAME_KANA + TEXT_TYPE + COMMA_SEP
-            + ItemsTable.COLUMN_NAME_MEANING + TEXT_TYPE + COMMA_SEP
-            + ItemsTable.COLUMN_NAME_IMAGE + TEXT_TYPE + COMMA_SEP
-            + ItemsTable.COLUMN_NAME_ONYOMI + TEXT_TYPE + COMMA_SEP
-            + ItemsTable.COLUMN_NAME_KUNYOMI + TEXT_TYPE + COMMA_SEP
-            + ItemsTable.COLUMN_NAME_IMPORTANT_READING + TEXT_TYPE + COMMA_SEP
-            + ItemsTable.COLUMN_NAME_LEVEL + INTEGER_TYPE + COMMA_SEP
-            + ItemsTable.COLUMN_NAME_ITEM_TYPE + TEXT_TYPE + COMMA_SEP
-            + ItemsTable.COLUMN_NAME_SRS + TEXT_TYPE + COMMA_SEP
-            + ItemsTable.COLUMN_NAME_UNLOCKED_DATE + INTEGER_TYPE + COMMA_SEP
-            + ItemsTable.COLUMN_NAME_AVAILABLE_DATE + INTEGER_TYPE + COMMA_SEP
-            + ItemsTable.COLUMN_NAME_BURNED + INTEGER_TYPE + COMMA_SEP
-            + ItemsTable.COLUMN_NAME_BURNED_DATE + INTEGER_TYPE + COMMA_SEP
-            + ItemsTable.COLUMN_NAME_MEANING_CORRECT + INTEGER_TYPE + COMMA_SEP
-            + ItemsTable.COLUMN_NAME_MEANING_INCORRECT + INTEGER_TYPE + COMMA_SEP
-            + ItemsTable.COLUMN_NAME_MEANING_MAX_STREAK + INTEGER_TYPE + COMMA_SEP
-            + ItemsTable.COLUMN_NAME_MEANING_CURRENT_STREAK + INTEGER_TYPE + COMMA_SEP
-            + ItemsTable.COLUMN_NAME_READING_CORRECT + INTEGER_TYPE + COMMA_SEP
-            + ItemsTable.COLUMN_NAME_READING_INCORRECT + INTEGER_TYPE + COMMA_SEP
-            + ItemsTable.COLUMN_NAME_READING_MAX_STREAK + INTEGER_TYPE + COMMA_SEP
-            + ItemsTable.COLUMN_NAME_READING_CURRENT_STREAK + INTEGER_TYPE + COMMA_SEP
-            + ItemsTable.COLUMN_NAME_MEANING_NOTE + TEXT_TYPE + COMMA_SEP
-            + ItemsTable.COLUMN_NAME_USER_SYNONYMS + TEXT_TYPE + COMMA_SEP
-            + ItemsTable.COLUMN_NAME_READING_NOTE + TEXT_TYPE + COMMA_SEP
-            + ItemsTable.COLUMN_NAME_NULLABLE + TEXT_TYPE + ")";
+        + ItemsTable.TABLE_NAME + " ("
+        + ItemsTable.COLUMN_NAME_ID + INTEGER_PRIMARY_KEY_AUTOINCREMENT + COMMA_SEP
+        + ItemsTable.COLUMN_NAME_CHARACTER + TEXT_TYPE + COMMA_SEP
+        + ItemsTable.COLUMN_NAME_KANA + TEXT_TYPE + COMMA_SEP
+        + ItemsTable.COLUMN_NAME_MEANING + TEXT_TYPE + COMMA_SEP
+        + ItemsTable.COLUMN_NAME_IMAGE + TEXT_TYPE + COMMA_SEP
+        + ItemsTable.COLUMN_NAME_ONYOMI + TEXT_TYPE + COMMA_SEP
+        + ItemsTable.COLUMN_NAME_KUNYOMI + TEXT_TYPE + COMMA_SEP
+        + ItemsTable.COLUMN_NAME_IMPORTANT_READING + TEXT_TYPE + COMMA_SEP
+        + ItemsTable.COLUMN_NAME_LEVEL + INTEGER_TYPE + COMMA_SEP
+        + ItemsTable.COLUMN_NAME_ITEM_TYPE + TEXT_TYPE + COMMA_SEP
+        + ItemsTable.COLUMN_NAME_SRS + TEXT_TYPE + COMMA_SEP
+        + ItemsTable.COLUMN_NAME_UNLOCKED_DATE + INTEGER_TYPE + COMMA_SEP
+        + ItemsTable.COLUMN_NAME_AVAILABLE_DATE + INTEGER_TYPE + COMMA_SEP
+        + ItemsTable.COLUMN_NAME_BURNED + INTEGER_TYPE + COMMA_SEP
+        + ItemsTable.COLUMN_NAME_BURNED_DATE + INTEGER_TYPE + COMMA_SEP
+        + ItemsTable.COLUMN_NAME_MEANING_CORRECT + INTEGER_TYPE + COMMA_SEP
+        + ItemsTable.COLUMN_NAME_MEANING_INCORRECT + INTEGER_TYPE + COMMA_SEP
+        + ItemsTable.COLUMN_NAME_MEANING_MAX_STREAK + INTEGER_TYPE + COMMA_SEP
+        + ItemsTable.COLUMN_NAME_MEANING_CURRENT_STREAK + INTEGER_TYPE + COMMA_SEP
+        + ItemsTable.COLUMN_NAME_READING_CORRECT + INTEGER_TYPE + COMMA_SEP
+        + ItemsTable.COLUMN_NAME_READING_INCORRECT + INTEGER_TYPE + COMMA_SEP
+        + ItemsTable.COLUMN_NAME_READING_MAX_STREAK + INTEGER_TYPE + COMMA_SEP
+        + ItemsTable.COLUMN_NAME_READING_CURRENT_STREAK + INTEGER_TYPE + COMMA_SEP
+        + ItemsTable.COLUMN_NAME_MEANING_NOTE + TEXT_TYPE + COMMA_SEP
+        + ItemsTable.COLUMN_NAME_USER_SYNONYMS + TEXT_TYPE + COMMA_SEP
+        + ItemsTable.COLUMN_NAME_READING_NOTE + TEXT_TYPE + COMMA_SEP
+        + ItemsTable.COLUMN_NAME_NULLABLE + TEXT_TYPE + ")";
 
     public static final String DELETE_TABLE_ITEMS = "DROP TABLE IF EXISTS "
-            + ItemsTable.TABLE_NAME;
+        + ItemsTable.TABLE_NAME;
 
     public static final String CREATE_TABLE_RECENT_UNLOCKS = "CREATE TABLE "
-            + RecentUnlocksTable.TABLE_NAME + " ("
-            + RecentUnlocksTable.COLUMN_NAME_ID + INTEGER_PRIMARY_KEY_AUTOINCREMENT + COMMA_SEP
-            + RecentUnlocksTable.COLUMN_NAME_CHARACTER + TEXT_TYPE + COMMA_SEP
-            + RecentUnlocksTable.COLUMN_NAME_KANA + TEXT_TYPE + COMMA_SEP
-            + RecentUnlocksTable.COLUMN_NAME_MEANING + TEXT_TYPE + COMMA_SEP
-            + RecentUnlocksTable.COLUMN_NAME_IMAGE + TEXT_TYPE + COMMA_SEP
-            + RecentUnlocksTable.COLUMN_NAME_ONYOMI + TEXT_TYPE + COMMA_SEP
-            + RecentUnlocksTable.COLUMN_NAME_KUNYOMI + TEXT_TYPE + COMMA_SEP
-            + RecentUnlocksTable.COLUMN_NAME_IMPORTANT_READING + TEXT_TYPE + COMMA_SEP
-            + RecentUnlocksTable.COLUMN_NAME_LEVEL + INTEGER_TYPE + COMMA_SEP
-            + RecentUnlocksTable.COLUMN_NAME_ITEM_TYPE + TEXT_TYPE + COMMA_SEP
-            + RecentUnlocksTable.COLUMN_NAME_SRS + TEXT_TYPE + COMMA_SEP
-            + RecentUnlocksTable.COLUMN_NAME_UNLOCKED_DATE + INTEGER_TYPE + COMMA_SEP
-            + RecentUnlocksTable.COLUMN_NAME_AVAILABLE_DATE + INTEGER_TYPE + COMMA_SEP
-            + RecentUnlocksTable.COLUMN_NAME_BURNED + INTEGER_TYPE + COMMA_SEP
-            + RecentUnlocksTable.COLUMN_NAME_BURNED_DATE + INTEGER_TYPE + COMMA_SEP
-            + RecentUnlocksTable.COLUMN_NAME_MEANING_CORRECT + INTEGER_TYPE + COMMA_SEP
-            + RecentUnlocksTable.COLUMN_NAME_MEANING_INCORRECT + INTEGER_TYPE + COMMA_SEP
-            + RecentUnlocksTable.COLUMN_NAME_MEANING_MAX_STREAK + INTEGER_TYPE + COMMA_SEP
-            + RecentUnlocksTable.COLUMN_NAME_MEANING_CURRENT_STREAK + INTEGER_TYPE + COMMA_SEP
-            + RecentUnlocksTable.COLUMN_NAME_READING_CORRECT + INTEGER_TYPE + COMMA_SEP
-            + RecentUnlocksTable.COLUMN_NAME_READING_INCORRECT + INTEGER_TYPE + COMMA_SEP
-            + RecentUnlocksTable.COLUMN_NAME_READING_MAX_STREAK + INTEGER_TYPE + COMMA_SEP
-            + RecentUnlocksTable.COLUMN_NAME_READING_CURRENT_STREAK + INTEGER_TYPE + COMMA_SEP
-            + RecentUnlocksTable.COLUMN_NAME_MEANING_NOTE + TEXT_TYPE + COMMA_SEP
-            + RecentUnlocksTable.COLUMN_NAME_USER_SYNONYMS + TEXT_TYPE + COMMA_SEP
-            + RecentUnlocksTable.COLUMN_NAME_READING_NOTE + TEXT_TYPE + COMMA_SEP
-            + RecentUnlocksTable.COLUMN_NAME_NULLABLE + TEXT_TYPE  + ")";
+        + RecentUnlocksTable.TABLE_NAME + " ("
+        + RecentUnlocksTable.COLUMN_NAME_ID + INTEGER_PRIMARY_KEY_AUTOINCREMENT + COMMA_SEP
+        + RecentUnlocksTable.COLUMN_NAME_CHARACTER + TEXT_TYPE + COMMA_SEP
+        + RecentUnlocksTable.COLUMN_NAME_KANA + TEXT_TYPE + COMMA_SEP
+        + RecentUnlocksTable.COLUMN_NAME_MEANING + TEXT_TYPE + COMMA_SEP
+        + RecentUnlocksTable.COLUMN_NAME_IMAGE + TEXT_TYPE + COMMA_SEP
+        + RecentUnlocksTable.COLUMN_NAME_ONYOMI + TEXT_TYPE + COMMA_SEP
+        + RecentUnlocksTable.COLUMN_NAME_KUNYOMI + TEXT_TYPE + COMMA_SEP
+        + RecentUnlocksTable.COLUMN_NAME_IMPORTANT_READING + TEXT_TYPE + COMMA_SEP
+        + RecentUnlocksTable.COLUMN_NAME_LEVEL + INTEGER_TYPE + COMMA_SEP
+        + RecentUnlocksTable.COLUMN_NAME_ITEM_TYPE + TEXT_TYPE + COMMA_SEP
+        + RecentUnlocksTable.COLUMN_NAME_SRS + TEXT_TYPE + COMMA_SEP
+        + RecentUnlocksTable.COLUMN_NAME_UNLOCKED_DATE + INTEGER_TYPE + COMMA_SEP
+        + RecentUnlocksTable.COLUMN_NAME_AVAILABLE_DATE + INTEGER_TYPE + COMMA_SEP
+        + RecentUnlocksTable.COLUMN_NAME_BURNED + INTEGER_TYPE + COMMA_SEP
+        + RecentUnlocksTable.COLUMN_NAME_BURNED_DATE + INTEGER_TYPE + COMMA_SEP
+        + RecentUnlocksTable.COLUMN_NAME_MEANING_CORRECT + INTEGER_TYPE + COMMA_SEP
+        + RecentUnlocksTable.COLUMN_NAME_MEANING_INCORRECT + INTEGER_TYPE + COMMA_SEP
+        + RecentUnlocksTable.COLUMN_NAME_MEANING_MAX_STREAK + INTEGER_TYPE + COMMA_SEP
+        + RecentUnlocksTable.COLUMN_NAME_MEANING_CURRENT_STREAK + INTEGER_TYPE + COMMA_SEP
+        + RecentUnlocksTable.COLUMN_NAME_READING_CORRECT + INTEGER_TYPE + COMMA_SEP
+        + RecentUnlocksTable.COLUMN_NAME_READING_INCORRECT + INTEGER_TYPE + COMMA_SEP
+        + RecentUnlocksTable.COLUMN_NAME_READING_MAX_STREAK + INTEGER_TYPE + COMMA_SEP
+        + RecentUnlocksTable.COLUMN_NAME_READING_CURRENT_STREAK + INTEGER_TYPE + COMMA_SEP
+        + RecentUnlocksTable.COLUMN_NAME_MEANING_NOTE + TEXT_TYPE + COMMA_SEP
+        + RecentUnlocksTable.COLUMN_NAME_USER_SYNONYMS + TEXT_TYPE + COMMA_SEP
+        + RecentUnlocksTable.COLUMN_NAME_READING_NOTE + TEXT_TYPE + COMMA_SEP
+        + RecentUnlocksTable.COLUMN_NAME_NULLABLE + TEXT_TYPE + ")";
 
     public static final String DELETE_TABLE_RECENT_UNLOCKS = "DROP TABLE IF EXISTS "
-            + RecentUnlocksTable.TABLE_NAME;
+        + RecentUnlocksTable.TABLE_NAME;
 
     public static final String CREATE_TABLE_CRITICAL_ITEMS = "CREATE TABLE "
-            + CriticalItemsTable.TABLE_NAME + " ("
-            + CriticalItemsTable.COLUMN_NAME_ID + INTEGER_PRIMARY_KEY_AUTOINCREMENT + COMMA_SEP
-            + CriticalItemsTable.COLUMN_NAME_CHARACTER + TEXT_TYPE + COMMA_SEP
-            + CriticalItemsTable.COLUMN_NAME_KANA + TEXT_TYPE + COMMA_SEP
-            + CriticalItemsTable.COLUMN_NAME_MEANING + TEXT_TYPE + COMMA_SEP
-            + CriticalItemsTable.COLUMN_NAME_IMAGE + TEXT_TYPE + COMMA_SEP
-            + CriticalItemsTable.COLUMN_NAME_ONYOMI + TEXT_TYPE + COMMA_SEP
-            + CriticalItemsTable.COLUMN_NAME_KUNYOMI + TEXT_TYPE + COMMA_SEP
-            + CriticalItemsTable.COLUMN_NAME_IMPORTANT_READING + TEXT_TYPE + COMMA_SEP
-            + CriticalItemsTable.COLUMN_NAME_LEVEL + INTEGER_TYPE + COMMA_SEP
-            + CriticalItemsTable.COLUMN_NAME_ITEM_TYPE + TEXT_TYPE + COMMA_SEP
-            + CriticalItemsTable.COLUMN_NAME_SRS + TEXT_TYPE + COMMA_SEP
-            + CriticalItemsTable.COLUMN_NAME_UNLOCKED_DATE + INTEGER_TYPE + COMMA_SEP
-            + CriticalItemsTable.COLUMN_NAME_AVAILABLE_DATE + INTEGER_TYPE + COMMA_SEP
-            + CriticalItemsTable.COLUMN_NAME_BURNED + INTEGER_TYPE + COMMA_SEP
-            + CriticalItemsTable.COLUMN_NAME_BURNED_DATE + INTEGER_TYPE + COMMA_SEP
-            + CriticalItemsTable.COLUMN_NAME_MEANING_CORRECT + INTEGER_TYPE + COMMA_SEP
-            + CriticalItemsTable.COLUMN_NAME_MEANING_INCORRECT + INTEGER_TYPE + COMMA_SEP
-            + CriticalItemsTable.COLUMN_NAME_MEANING_MAX_STREAK + INTEGER_TYPE + COMMA_SEP
-            + CriticalItemsTable.COLUMN_NAME_MEANING_CURRENT_STREAK + INTEGER_TYPE + COMMA_SEP
-            + CriticalItemsTable.COLUMN_NAME_READING_CORRECT + INTEGER_TYPE + COMMA_SEP
-            + CriticalItemsTable.COLUMN_NAME_READING_INCORRECT + INTEGER_TYPE + COMMA_SEP
-            + CriticalItemsTable.COLUMN_NAME_READING_MAX_STREAK + INTEGER_TYPE + COMMA_SEP
-            + CriticalItemsTable.COLUMN_NAME_READING_CURRENT_STREAK + INTEGER_TYPE + COMMA_SEP
-            + CriticalItemsTable.COLUMN_NAME_MEANING_NOTE + TEXT_TYPE + COMMA_SEP
-            + CriticalItemsTable.COLUMN_NAME_USER_SYNONYMS + TEXT_TYPE + COMMA_SEP
-            + CriticalItemsTable.COLUMN_NAME_READING_NOTE + TEXT_TYPE + COMMA_SEP
-            + CriticalItemsTable.COLUMN_NAME_PERCENTAGE + INTEGER_TYPE + COMMA_SEP
-            + CriticalItemsTable.COLUMN_NAME_NULLABLE + TEXT_TYPE  + ")";
+        + CriticalItemsTable.TABLE_NAME + " ("
+        + CriticalItemsTable.COLUMN_NAME_ID + INTEGER_PRIMARY_KEY_AUTOINCREMENT + COMMA_SEP
+        + CriticalItemsTable.COLUMN_NAME_CHARACTER + TEXT_TYPE + COMMA_SEP
+        + CriticalItemsTable.COLUMN_NAME_KANA + TEXT_TYPE + COMMA_SEP
+        + CriticalItemsTable.COLUMN_NAME_MEANING + TEXT_TYPE + COMMA_SEP
+        + CriticalItemsTable.COLUMN_NAME_IMAGE + TEXT_TYPE + COMMA_SEP
+        + CriticalItemsTable.COLUMN_NAME_ONYOMI + TEXT_TYPE + COMMA_SEP
+        + CriticalItemsTable.COLUMN_NAME_KUNYOMI + TEXT_TYPE + COMMA_SEP
+        + CriticalItemsTable.COLUMN_NAME_IMPORTANT_READING + TEXT_TYPE + COMMA_SEP
+        + CriticalItemsTable.COLUMN_NAME_LEVEL + INTEGER_TYPE + COMMA_SEP
+        + CriticalItemsTable.COLUMN_NAME_ITEM_TYPE + TEXT_TYPE + COMMA_SEP
+        + CriticalItemsTable.COLUMN_NAME_SRS + TEXT_TYPE + COMMA_SEP
+        + CriticalItemsTable.COLUMN_NAME_UNLOCKED_DATE + INTEGER_TYPE + COMMA_SEP
+        + CriticalItemsTable.COLUMN_NAME_AVAILABLE_DATE + INTEGER_TYPE + COMMA_SEP
+        + CriticalItemsTable.COLUMN_NAME_BURNED + INTEGER_TYPE + COMMA_SEP
+        + CriticalItemsTable.COLUMN_NAME_BURNED_DATE + INTEGER_TYPE + COMMA_SEP
+        + CriticalItemsTable.COLUMN_NAME_MEANING_CORRECT + INTEGER_TYPE + COMMA_SEP
+        + CriticalItemsTable.COLUMN_NAME_MEANING_INCORRECT + INTEGER_TYPE + COMMA_SEP
+        + CriticalItemsTable.COLUMN_NAME_MEANING_MAX_STREAK + INTEGER_TYPE + COMMA_SEP
+        + CriticalItemsTable.COLUMN_NAME_MEANING_CURRENT_STREAK + INTEGER_TYPE + COMMA_SEP
+        + CriticalItemsTable.COLUMN_NAME_READING_CORRECT + INTEGER_TYPE + COMMA_SEP
+        + CriticalItemsTable.COLUMN_NAME_READING_INCORRECT + INTEGER_TYPE + COMMA_SEP
+        + CriticalItemsTable.COLUMN_NAME_READING_MAX_STREAK + INTEGER_TYPE + COMMA_SEP
+        + CriticalItemsTable.COLUMN_NAME_READING_CURRENT_STREAK + INTEGER_TYPE + COMMA_SEP
+        + CriticalItemsTable.COLUMN_NAME_MEANING_NOTE + TEXT_TYPE + COMMA_SEP
+        + CriticalItemsTable.COLUMN_NAME_USER_SYNONYMS + TEXT_TYPE + COMMA_SEP
+        + CriticalItemsTable.COLUMN_NAME_READING_NOTE + TEXT_TYPE + COMMA_SEP
+        + CriticalItemsTable.COLUMN_NAME_PERCENTAGE + INTEGER_TYPE + COMMA_SEP
+        + CriticalItemsTable.COLUMN_NAME_NULLABLE + TEXT_TYPE + ")";
 
     public static final String DELETE_TABLE_CRITICAL_ITEMS = "DROP TABLE IF EXISTS "
-            + CriticalItemsTable.TABLE_NAME;
+        + CriticalItemsTable.TABLE_NAME;
 
     public static final String CREATE_TABLE_STUDY_QUEUE = "CREATE TABLE "
-            + StudyQueueTable.TABLE_NAME + " ("
-            + StudyQueueTable.COLUMN_NAME_ID + INTEGER_PRIMARY_KEY_AUTOINCREMENT + COMMA_SEP
-            + StudyQueueTable.COLUMN_NAME_LESSONS_AVAILABLE + INTEGER_TYPE + COMMA_SEP
-            + StudyQueueTable.COLUMN_NAME_REVIEWS_AVAILABLE + INTEGER_TYPE + COMMA_SEP
-            + StudyQueueTable.COLUMN_NAME_REVIEWS_AVAILABLE_NEXT_HOUR + INTEGER_TYPE + COMMA_SEP
-            + StudyQueueTable.COLUMN_NAME_REVIEWS_AVAILABLE_NEXT_DAY + INTEGER_TYPE + COMMA_SEP
-            + StudyQueueTable.COLUMN_NAME_NEXT_REVIEW_DATE + INTEGER_TYPE + COMMA_SEP
-            + StudyQueueTable.COLUMN_NAME_NULLABLE + TEXT_TYPE  + ")";
+        + StudyQueueTable.TABLE_NAME + " ("
+        + StudyQueueTable.COLUMN_NAME_ID + INTEGER_PRIMARY_KEY_AUTOINCREMENT + COMMA_SEP
+        + StudyQueueTable.COLUMN_NAME_LESSONS_AVAILABLE + INTEGER_TYPE + COMMA_SEP
+        + StudyQueueTable.COLUMN_NAME_REVIEWS_AVAILABLE + INTEGER_TYPE + COMMA_SEP
+        + StudyQueueTable.COLUMN_NAME_REVIEWS_AVAILABLE_NEXT_HOUR + INTEGER_TYPE + COMMA_SEP
+        + StudyQueueTable.COLUMN_NAME_REVIEWS_AVAILABLE_NEXT_DAY + INTEGER_TYPE + COMMA_SEP
+        + StudyQueueTable.COLUMN_NAME_NEXT_REVIEW_DATE + INTEGER_TYPE + COMMA_SEP
+        + StudyQueueTable.COLUMN_NAME_NULLABLE + TEXT_TYPE + ")";
 
     public static final String DELETE_TABLE_STUDY_QUEUE = "DROP TABLE IF EXISTS "
-            + StudyQueueTable.TABLE_NAME;
+        + StudyQueueTable.TABLE_NAME;
 
     public static final String CREATE_TABLE_LEVEL_PROGRESSION = "CREATE TABLE "
-            + LevelProgressionTable.TABLE_NAME + " ("
-            + LevelProgressionTable.COLUMN_NAME_ID + INTEGER_PRIMARY_KEY_AUTOINCREMENT + COMMA_SEP
-            + LevelProgressionTable.COLUMN_NAME_RADICALS_PROGRESS + INTEGER_TYPE + COMMA_SEP
-            + LevelProgressionTable.COLUMN_NAME_RADICALS_TOTAL + INTEGER_TYPE + COMMA_SEP
-            + LevelProgressionTable.COLUMN_NAME_REVIEWS_KANJI_PROGRESS + INTEGER_TYPE + COMMA_SEP
-            + LevelProgressionTable.COLUMN_NAME_REVIEWS_KANJI_TOTAL + INTEGER_TYPE + COMMA_SEP
-            + LevelProgressionTable.COLUMN_NAME_NULLABLE + TEXT_TYPE  + ")";
+        + LevelProgressionTable.TABLE_NAME + " ("
+        + LevelProgressionTable.COLUMN_NAME_ID + INTEGER_PRIMARY_KEY_AUTOINCREMENT + COMMA_SEP
+        + LevelProgressionTable.COLUMN_NAME_RADICALS_PROGRESS + INTEGER_TYPE + COMMA_SEP
+        + LevelProgressionTable.COLUMN_NAME_RADICALS_TOTAL + INTEGER_TYPE + COMMA_SEP
+        + LevelProgressionTable.COLUMN_NAME_REVIEWS_KANJI_PROGRESS + INTEGER_TYPE + COMMA_SEP
+        + LevelProgressionTable.COLUMN_NAME_REVIEWS_KANJI_TOTAL + INTEGER_TYPE + COMMA_SEP
+        + LevelProgressionTable.COLUMN_NAME_NULLABLE + TEXT_TYPE + ")";
 
     public static final String DELETE_TABLE_LEVEL_PROGRESSION = "DROP TABLE IF EXISTS "
-            + LevelProgressionTable.TABLE_NAME;
+        + LevelProgressionTable.TABLE_NAME;
 
     public static final String CREATE_TABLE_SRS = "CREATE TABLE "
-            + SRSDistributionTable.TABLE_NAME + " ("
-            + SRSDistributionTable.COLUMN_NAME_ID + INTEGER_PRIMARY_KEY_AUTOINCREMENT + COMMA_SEP
-            + SRSDistributionTable.COLUMN_NAME_APPRENTICE_RADICALS + INTEGER_TYPE + COMMA_SEP
-            + SRSDistributionTable.COLUMN_NAME_APPRENTICE_KANJI + INTEGER_TYPE + COMMA_SEP
-            + SRSDistributionTable.COLUMN_NAME_APPRENTICE_VOCABULARY + INTEGER_TYPE + COMMA_SEP
-            + SRSDistributionTable.COLUMN_NAME_GURU_RADICALS + INTEGER_TYPE + COMMA_SEP
-            + SRSDistributionTable.COLUMN_NAME_GURU_KANJI + INTEGER_TYPE + COMMA_SEP
-            + SRSDistributionTable.COLUMN_NAME_GURU_VOCABULARY + INTEGER_TYPE + COMMA_SEP
-            + SRSDistributionTable.COLUMN_NAME_MASTER_RADICALS + INTEGER_TYPE + COMMA_SEP
-            + SRSDistributionTable.COLUMN_NAME_MASTER_KANJI + INTEGER_TYPE + COMMA_SEP
-            + SRSDistributionTable.COLUMN_NAME_MASTER_VOCABULARY + INTEGER_TYPE + COMMA_SEP
-            + SRSDistributionTable.COLUMN_NAME_ENLIGHTENED_RADICALS + INTEGER_TYPE + COMMA_SEP
-            + SRSDistributionTable.COLUMN_NAME_ENLIGHTENED_KANJI + INTEGER_TYPE + COMMA_SEP
-            + SRSDistributionTable.COLUMN_NAME_ENLIGHTENED_VOCABULARY + INTEGER_TYPE + COMMA_SEP
-            + SRSDistributionTable.COLUMN_NAME_BURNED_RADICALS + INTEGER_TYPE + COMMA_SEP
-            + SRSDistributionTable.COLUMN_NAME_BURNED_KANJI + INTEGER_TYPE + COMMA_SEP
-            + SRSDistributionTable.COLUMN_NAME_BURNED_VOCABULARY + INTEGER_TYPE + COMMA_SEP
-            + SRSDistributionTable.COLUMN_NAME_NULLABLE + TEXT_TYPE + ")";
+        + SRSDistributionTable.TABLE_NAME + " ("
+        + SRSDistributionTable.COLUMN_NAME_ID + INTEGER_PRIMARY_KEY_AUTOINCREMENT + COMMA_SEP
+        + SRSDistributionTable.COLUMN_NAME_APPRENTICE_RADICALS + INTEGER_TYPE + COMMA_SEP
+        + SRSDistributionTable.COLUMN_NAME_APPRENTICE_KANJI + INTEGER_TYPE + COMMA_SEP
+        + SRSDistributionTable.COLUMN_NAME_APPRENTICE_VOCABULARY + INTEGER_TYPE + COMMA_SEP
+        + SRSDistributionTable.COLUMN_NAME_GURU_RADICALS + INTEGER_TYPE + COMMA_SEP
+        + SRSDistributionTable.COLUMN_NAME_GURU_KANJI + INTEGER_TYPE + COMMA_SEP
+        + SRSDistributionTable.COLUMN_NAME_GURU_VOCABULARY + INTEGER_TYPE + COMMA_SEP
+        + SRSDistributionTable.COLUMN_NAME_MASTER_RADICALS + INTEGER_TYPE + COMMA_SEP
+        + SRSDistributionTable.COLUMN_NAME_MASTER_KANJI + INTEGER_TYPE + COMMA_SEP
+        + SRSDistributionTable.COLUMN_NAME_MASTER_VOCABULARY + INTEGER_TYPE + COMMA_SEP
+        + SRSDistributionTable.COLUMN_NAME_ENLIGHTENED_RADICALS + INTEGER_TYPE + COMMA_SEP
+        + SRSDistributionTable.COLUMN_NAME_ENLIGHTENED_KANJI + INTEGER_TYPE + COMMA_SEP
+        + SRSDistributionTable.COLUMN_NAME_ENLIGHTENED_VOCABULARY + INTEGER_TYPE + COMMA_SEP
+        + SRSDistributionTable.COLUMN_NAME_BURNED_RADICALS + INTEGER_TYPE + COMMA_SEP
+        + SRSDistributionTable.COLUMN_NAME_BURNED_KANJI + INTEGER_TYPE + COMMA_SEP
+        + SRSDistributionTable.COLUMN_NAME_BURNED_VOCABULARY + INTEGER_TYPE + COMMA_SEP
+        + SRSDistributionTable.COLUMN_NAME_NULLABLE + TEXT_TYPE + ")";
 
     public static final String DELETE_TABLE_SRS = "DROP TABLE IF EXISTS "
-            + SRSDistributionTable.TABLE_NAME;
+        + SRSDistributionTable.TABLE_NAME;
 
     public static final String CREATE_TABLE_USERS = "CREATE TABLE "
-            + UsersTable.TABLE_NAME + " ("
-            + UsersTable.COLUMN_NAME_ID + INTEGER_PRIMARY_KEY_AUTOINCREMENT + COMMA_SEP
-            + UsersTable.COLUMN_NAME_USERNAME + TEXT_TYPE + COMMA_SEP
-            + UsersTable.COLUMN_NAME_GRAVATAR + TEXT_TYPE + COMMA_SEP
-            + UsersTable.COLUMN_NAME_LEVEL + INTEGER_TYPE + COMMA_SEP
-            + UsersTable.COLUMN_NAME_TITLE + TEXT_TYPE + COMMA_SEP
-            + UsersTable.COLUMN_NAME_ABOUT + TEXT_TYPE + COMMA_SEP
-            + UsersTable.COLUMN_NAME_WEBSITE + TEXT_TYPE + COMMA_SEP
-            + UsersTable.COLUMN_NAME_TWITTER + TEXT_TYPE + COMMA_SEP
-            + UsersTable.COLUMN_NAME_TOPICS_COUNT + INTEGER_TYPE + COMMA_SEP
-            + UsersTable.COLUMN_NAME_POSTS_COUNT + INTEGER_TYPE + COMMA_SEP
-            + UsersTable.COLUMN_NAME_CREATION_DATE + INTEGER_TYPE + COMMA_SEP
-            + UsersTable.COLUMN_NAME_VACATION_DATE + INTEGER_TYPE + COMMA_SEP
-            + UsersTable.COLUMN_NAME_NULLABLE + TEXT_TYPE  + ")";
+        + UsersTable.TABLE_NAME + " ("
+        + UsersTable.COLUMN_NAME_ID + INTEGER_PRIMARY_KEY_AUTOINCREMENT + COMMA_SEP
+        + UsersTable.COLUMN_NAME_USERNAME + TEXT_TYPE + COMMA_SEP
+        + UsersTable.COLUMN_NAME_GRAVATAR + TEXT_TYPE + COMMA_SEP
+        + UsersTable.COLUMN_NAME_LEVEL + INTEGER_TYPE + COMMA_SEP
+        + UsersTable.COLUMN_NAME_TITLE + TEXT_TYPE + COMMA_SEP
+        + UsersTable.COLUMN_NAME_ABOUT + TEXT_TYPE + COMMA_SEP
+        + UsersTable.COLUMN_NAME_WEBSITE + TEXT_TYPE + COMMA_SEP
+        + UsersTable.COLUMN_NAME_TWITTER + TEXT_TYPE + COMMA_SEP
+        + UsersTable.COLUMN_NAME_TOPICS_COUNT + INTEGER_TYPE + COMMA_SEP
+        + UsersTable.COLUMN_NAME_POSTS_COUNT + INTEGER_TYPE + COMMA_SEP
+        + UsersTable.COLUMN_NAME_CREATION_DATE + INTEGER_TYPE + COMMA_SEP
+        + UsersTable.COLUMN_NAME_VACATION_DATE + INTEGER_TYPE + COMMA_SEP
+        + UsersTable.COLUMN_NAME_NULLABLE + TEXT_TYPE + ")";
 
     public static final String DELETE_TABLE_USERS = "DROP TABLE IF EXISTS "
-            + UsersTable.TABLE_NAME;
+        + UsersTable.TABLE_NAME;
 
     public static final String CREATE_TABLE_NOTIFICATIONS = "CREATE TABLE "
-            + NotificationsTable.TABLE_NAME + " ("
-            + NotificationsTable.COLUMN_NAME_ID + INTEGER_PRIMARY_KEY + COMMA_SEP
-            + NotificationsTable.COLUMN_NAME_TITLE + TEXT_TYPE + COMMA_SEP
-            + NotificationsTable.COLUMN_NAME_SHORT_TEXT+ TEXT_TYPE + COMMA_SEP
-            + NotificationsTable.COLUMN_NAME_TEXT + TEXT_TYPE + COMMA_SEP
-            + NotificationsTable.COLUMN_NAME_IMAGE + TEXT_TYPE + COMMA_SEP
-            + NotificationsTable.COLUMN_NAME_ACTION_URL + TEXT_TYPE + COMMA_SEP
-            + NotificationsTable.COLUMN_NAME_ACTION_TEXT + TEXT_TYPE + COMMA_SEP
-            + NotificationsTable.COLUMN_NAME_READ + INTEGER_TYPE + COMMA_SEP
-            + NotificationsTable.COLUMN_NAME_NULLABLE + TEXT_TYPE + ")";
+        + NotificationsTable.TABLE_NAME + " ("
+        + NotificationsTable.COLUMN_NAME_ID + INTEGER_PRIMARY_KEY + COMMA_SEP
+        + NotificationsTable.COLUMN_NAME_TITLE + TEXT_TYPE + COMMA_SEP
+        + NotificationsTable.COLUMN_NAME_SHORT_TEXT + TEXT_TYPE + COMMA_SEP
+        + NotificationsTable.COLUMN_NAME_TEXT + TEXT_TYPE + COMMA_SEP
+        + NotificationsTable.COLUMN_NAME_IMAGE + TEXT_TYPE + COMMA_SEP
+        + NotificationsTable.COLUMN_NAME_ACTION_URL + TEXT_TYPE + COMMA_SEP
+        + NotificationsTable.COLUMN_NAME_ACTION_TEXT + TEXT_TYPE + COMMA_SEP
+        + NotificationsTable.COLUMN_NAME_READ + INTEGER_TYPE + COMMA_SEP
+        + NotificationsTable.COLUMN_NAME_NULLABLE + TEXT_TYPE + ")";
 
     public static final String DELETE_TABLE_NOTIFICATIONS = "DROP TABLE IF EXISTS "
-            + NotificationsTable.TABLE_NAME;
+        + NotificationsTable.TABLE_NAME;
 
     public static final String CREATE_TABLE_SUMMARY = "CREATE TABLE "
-            + SummaryTable.TABLE_NAME + " ("
-            + SummaryTable.COLUMN_NAME_ID + INTEGER_PRIMARY_KEY + COMMA_SEP
-            + SummaryTable.COLUMN_NAME_SUBJECT_ID + TEXT_TYPE + COMMA_SEP
-            + SummaryTable.COLUMN_NAME_TYPE + TEXT_TYPE + COMMA_SEP
-            + SummaryTable.COLUMN_NAME_AVAILABLE_AT + INTEGER_TYPE + COMMA_SEP
-            + SummaryTable.COLUMN_NAME_NULLABLE + TEXT_TYPE + ")";
+        + SummaryTable.TABLE_NAME + " ("
+        + SummaryTable.COLUMN_NAME_ID + INTEGER_PRIMARY_KEY + COMMA_SEP
+        + SummaryTable.COLUMN_NAME_SUBJECT_ID + TEXT_TYPE + COMMA_SEP
+        + SummaryTable.COLUMN_NAME_TYPE + TEXT_TYPE + COMMA_SEP
+        + SummaryTable.COLUMN_NAME_AVAILABLE_AT + INTEGER_TYPE + COMMA_SEP
+        + SummaryTable.COLUMN_NAME_NULLABLE + TEXT_TYPE + ")";
 
     public static final String DELETE_TABLE_SUMMARY = "DROP TABLE IF EXISTS "
-            + SummaryTable.TABLE_NAME;
+        + SummaryTable.TABLE_NAME;
 
     public static final String CREATE_TABLE_LAST_UPDATED = "CREATE TABLE "
-            + LastUpdatedTable.TABLE_NAME + " ("
-            + LastUpdatedTable.COLUMN_NAME_ID + INTEGER_PRIMARY_KEY + COMMA_SEP
-            + LastUpdatedTable.COLUMN_NAME_QUERY_NAME + TEXT_TYPE + COMMA_SEP
-            + LastUpdatedTable.COLUMN_NAME_QUERY_DATE + TEXT_TYPE + COMMA_SEP
-            + LastUpdatedTable.COLUMN_NAME_NULLABLE + TEXT_TYPE + ")";
+        + LastUpdatedTable.TABLE_NAME + " ("
+        + LastUpdatedTable.COLUMN_NAME_ID + INTEGER_PRIMARY_KEY + COMMA_SEP
+        + LastUpdatedTable.COLUMN_NAME_QUERY_NAME + TEXT_TYPE + COMMA_SEP
+        + LastUpdatedTable.COLUMN_NAME_QUERY_DATE + TEXT_TYPE + COMMA_SEP
+        + LastUpdatedTable.COLUMN_NAME_NULLABLE + TEXT_TYPE + ")";
 
     public static final String DELETE_TABLE_LAST_UPDATED = "DROP TABLE IF EXISTS "
-            + LastUpdatedTable.TABLE_NAME;
+        + LastUpdatedTable.TABLE_NAME;
 
     public static final String CREATE_TABLE_ASSIGNMENTS = "CREATE TABLE "
-            + AssignmentsTable.TABLE_NAME + " ("
-            + AssignmentsTable.COLUMN_NAME_ID + INTEGER_PRIMARY_KEY + COMMA_SEP
-            + AssignmentsTable.COLUMN_NAME_SUBJECT_ID + INTEGER_TYPE + COMMA_SEP
-            + AssignmentsTable.COLUMN_NAME_SUBJECT_TYPE + TEXT_TYPE + COMMA_SEP
-            + AssignmentsTable.COLUMN_NAME_SRS_STAGE + INTEGER_TYPE + COMMA_SEP
-            + AssignmentsTable.COLUMN_NAME_CREATED_AT + INTEGER_TYPE + COMMA_SEP
-            + AssignmentsTable.COLUMN_NAME_UNLOCKED_AT + INTEGER_TYPE + COMMA_SEP
-            + AssignmentsTable.COLUMN_NAME_STARTED_AT + INTEGER_TYPE + COMMA_SEP
-            + AssignmentsTable.COLUMN_NAME_PASSED_AT + INTEGER_TYPE + COMMA_SEP
-            + AssignmentsTable.COLUMN_NAME_BURNED_AT + INTEGER_TYPE + COMMA_SEP
-            + AssignmentsTable.COLUMN_NAME_AVAILABLE_AT + INTEGER_TYPE + COMMA_SEP
-            + AssignmentsTable.COLUMN_NAME_RESURRECTED_AT + INTEGER_TYPE + COMMA_SEP
-            + AssignmentsTable.COLUMN_NAME_NULLABLE + TEXT_TYPE + ")";
+        + AssignmentsTable.TABLE_NAME + " ("
+        + AssignmentsTable.COLUMN_NAME_ID + INTEGER_PRIMARY_KEY + COMMA_SEP
+        + AssignmentsTable.COLUMN_NAME_SUBJECT_ID + INTEGER_TYPE + COMMA_SEP
+        + AssignmentsTable.COLUMN_NAME_SUBJECT_TYPE + TEXT_TYPE + COMMA_SEP
+        + AssignmentsTable.COLUMN_NAME_SRS_STAGE + INTEGER_TYPE + COMMA_SEP
+        + AssignmentsTable.COLUMN_NAME_CREATED_AT + INTEGER_TYPE + COMMA_SEP
+        + AssignmentsTable.COLUMN_NAME_UNLOCKED_AT + INTEGER_TYPE + COMMA_SEP
+        + AssignmentsTable.COLUMN_NAME_STARTED_AT + INTEGER_TYPE + COMMA_SEP
+        + AssignmentsTable.COLUMN_NAME_PASSED_AT + INTEGER_TYPE + COMMA_SEP
+        + AssignmentsTable.COLUMN_NAME_BURNED_AT + INTEGER_TYPE + COMMA_SEP
+        + AssignmentsTable.COLUMN_NAME_AVAILABLE_AT + INTEGER_TYPE + COMMA_SEP
+        + AssignmentsTable.COLUMN_NAME_RESURRECTED_AT + INTEGER_TYPE + COMMA_SEP
+        + AssignmentsTable.COLUMN_NAME_NULLABLE + TEXT_TYPE + ")";
 
     public static final String DELETE_TABLE_ASSIGNMENTS = "DROP TABLE IF EXISTS "
-            + AssignmentsTable.TABLE_NAME;
+        + AssignmentsTable.TABLE_NAME;
+
+    public static final String CREATE_TABLE_SUBJECTS = "CREATE TABLE "
+        + SubjectsTable.TABLE_NAME + " ("
+        + SubjectsTable.COLUMN_NAME_ID + INTEGER_PRIMARY_KEY + COMMA_SEP
+        + SubjectsTable.COLUMN_NAME_SUBJECT_ID + INTEGER_TYPE + COMMA_SEP
+        + SubjectsTable.COLUMN_NAME_SUBJECT_TYPE + TEXT_TYPE + COMMA_SEP
+        + SubjectsTable.COLUMN_NAME_AUXILIARY_MEANINGS + TEXT_TYPE + COMMA_SEP
+        + SubjectsTable.COLUMN_NAME_CHARACTERS + TEXT_TYPE + COMMA_SEP
+        + SubjectsTable.COLUMN_NAME_CREATED_AT + INTEGER_TYPE + COMMA_SEP
+        + SubjectsTable.COLUMN_NAME_DOCUMENT_URL + TEXT_TYPE + COMMA_SEP
+        + SubjectsTable.COLUMN_NAME_HIDDEN_AT + INTEGER_TYPE + COMMA_SEP
+        + SubjectsTable.COLUMN_NAME_LESSON_POSITION + INTEGER_TYPE + COMMA_SEP
+        + SubjectsTable.COLUMN_NAME_LEVEL + INTEGER_TYPE + COMMA_SEP
+        + SubjectsTable.COLUMN_NAME_MEANING_MNEMONIC + TEXT_TYPE + COMMA_SEP
+        + SubjectsTable.COLUMN_NAME_MEANINGS + TEXT_TYPE + COMMA_SEP
+        + SubjectsTable.COLUMN_NAME_SLUG + TEXT_TYPE + COMMA_SEP
+        + SubjectsTable.COLUMN_NAME_SPACED_REPETITION_SYSTEM_ID + INTEGER_TYPE + COMMA_SEP
+        + SubjectsTable.COLUMN_NAME_AMALGAMATION_SUBJECT_IDS + TEXT_TYPE + COMMA_SEP
+        + SubjectsTable.COLUMN_NAME_CHARACTER_IMAGES + TEXT_TYPE + COMMA_SEP
+        + SubjectsTable.COLUMN_NAME_COMPONENT_SUBJECT_IDS + TEXT_TYPE + COMMA_SEP
+        + SubjectsTable.COLUMN_NAME_MEANING_HINT + TEXT_TYPE + COMMA_SEP
+        + SubjectsTable.COLUMN_NAME_READING_HINT + TEXT_TYPE + COMMA_SEP
+        + SubjectsTable.COLUMN_NAME_READING_MNEMONIC + TEXT_TYPE + COMMA_SEP
+        + SubjectsTable.COLUMN_NAME_READINGS + TEXT_TYPE + COMMA_SEP
+        + SubjectsTable.COLUMN_NAME_VISUALLY_SIMILAR_SUBJECT_IDS + TEXT_TYPE + COMMA_SEP
+        + SubjectsTable.COLUMN_NAME_CONTEXT_SENTENCES + TEXT_TYPE + COMMA_SEP
+        + SubjectsTable.COLUMN_NAME_PARTS_OF_SPEECH + TEXT_TYPE + COMMA_SEP
+        + SubjectsTable.COLUMN_NAME_PRONOUNCIATION_AUDIOS + TEXT_TYPE + COMMA_SEP
+        + SubjectsTable.COLUMN_NAME_NULLABLE + TEXT_TYPE + ")";
+
+    public static final String DELETE_TABLE_SUBJECTS = "DROP TABLE IF EXISTS "
+        + SubjectsTable.TABLE_NAME;
 }

@@ -42,6 +42,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(SQL.CREATE_TABLE_SUMMARY);
         db.execSQL(SQL.CREATE_TABLE_LAST_UPDATED);
         db.execSQL(SQL.CREATE_TABLE_ASSIGNMENTS);
+        db.execSQL(SQL.CREATE_TABLE_SUBJECTS);
     }
 
     @Override
@@ -54,6 +55,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 db.execSQL(SQL.DELETE_TABLE_STUDY_QUEUE);
                 db.execSQL(SQL.CREATE_TABLE_LAST_UPDATED);
                 db.execSQL(SQL.CREATE_TABLE_ASSIGNMENTS);
+                db.execSQL(SQL.CREATE_TABLE_SUBJECTS);
                 break;
         }
     }

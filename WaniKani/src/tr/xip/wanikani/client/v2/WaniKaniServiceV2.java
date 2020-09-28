@@ -25,6 +25,7 @@ import tr.xip.wanikani.models.v2.srs.SpacedRepetitionSystem;
 import tr.xip.wanikani.models.v2.subjects.StudyMaterial;
 import tr.xip.wanikani.models.v2.subjects.StudyMaterialCreate;
 import tr.xip.wanikani.models.v2.subjects.Subject;
+import tr.xip.wanikani.models.v2.subjects.SubjectCollection;
 import tr.xip.wanikani.models.v2.subjects.VoiceActor;
 import tr.xip.wanikani.models.v2.user.User;
 import tr.xip.wanikani.models.v2.user.UserUpdateRequest;
@@ -148,7 +149,7 @@ public interface WaniKaniServiceV2
 
     @Headers({"Wanikani-Revision: 20170710"})
     @GET("subjects")
-    Observable<Collection<Subject>> getSubjects(
+    Observable<SubjectCollection> getSubjects(
             @Header("Authorization") String api_key,
             @QueryMap Map<String, String> filters);
 

@@ -49,17 +49,18 @@ import tr.xip.wanikani.models.User;
 import tr.xip.wanikani.models.v2.Resource;
 import tr.xip.wanikani.models.v2.reviews.AssignmentCollection;
 import tr.xip.wanikani.models.v2.reviews.Summary;
+import tr.xip.wanikani.models.v2.subjects.SubjectCollection;
 
 public class DashboardFragment extends Fragment
-        implements SwipeRefreshLayout.OnRefreshListener,
-        AvailableCard.AvailableCardListener,
-        ReviewsCard.ReviewsCardListener,
-        SRSCard.StatusCardListener,
-        ProgressCard.ProgressCardListener,
-        RecentUnlocksCard.RecentUnlocksCardListener,
-        CriticalItemsCard.CriticalItemsCardListener,
-        MessageCard.MessageCardListener,
-        View.OnClickListener {
+    implements SwipeRefreshLayout.OnRefreshListener,
+    AvailableCard.AvailableCardListener,
+    ReviewsCard.ReviewsCardListener,
+    SRSCard.StatusCardListener,
+    ProgressCard.ProgressCardListener,
+    RecentUnlocksCard.RecentUnlocksCardListener,
+    CriticalItemsCard.CriticalItemsCardListener,
+    MessageCard.MessageCardListener,
+    View.OnClickListener {
 
     public static final String SYNC_RESULT_SUCCESS = "success";
     public static final String SYNC_RESULT_FAILED = "failed";
@@ -203,40 +204,46 @@ public class DashboardFragment extends Fragment
 //                WaniKaniApiV2.getStudyMaterials(new Filter()).toCompletable(),
 //                WaniKaniApiV2.getVoiceActors(new Filter()).toCompletable(),
 //                WaniKaniApiV2.getSubjects(new Filter()).toCompletable()
-                new DataUpdater(new Func1<Filter, Observable<Resource<tr.xip.wanikani.models.v2.user.User>>>() {
-                    @Override
-                    public Observable<Resource<tr.xip.wanikani.models.v2.user.User>> call(Filter filter) {
-                        return WaniKaniApiV2.getUser();
-                    }
-                }, "user").updateData(),
-                new DataUpdater(new Func1<Filter, Observable<AssignmentCollection>>() {
-                    @Override
-                    public Observable<AssignmentCollection> call(Filter filter) {
-                        return WaniKaniApiV2.getAssignments(filter);
-                    }
-                }, "assignments").updateData(),
-                new DataUpdater(new Func1<Filter, Observable<Summary>>() {
-                    @Override
-                    public Observable<Summary> call(Filter filter) {
-                        return WaniKaniApiV2.getSummary();
-                    }
-                }, "summary").updateData()
+            new DataUpdater(new Func1<Filter, Observable<Resource<tr.xip.wanikani.models.v2.user.User>>>() {
+                @Override
+                public Observable<Resource<tr.xip.wanikani.models.v2.user.User>> call(Filter filter) {
+                    return WaniKaniApiV2.getUser();
+                }
+            }, "user").updateData(),
+            new DataUpdater(new Func1<Filter, Observable<AssignmentCollection>>() {
+                @Override
+                public Observable<AssignmentCollection> call(Filter filter) {
+                    return WaniKaniApiV2.getAssignments(filter);
+                }
+            }, "assignments").updateData(),
+            new DataUpdater(new Func1<Filter, Observable<Summary>>() {
+                @Override
+                public Observable<Summary> call(Filter filter) {
+                    return WaniKaniApiV2.getSummary();
+                }
+            }, "summary").updateData(),
+            new DataUpdater(new Func1<Filter, Observable<SubjectCollection>>() {
+                @Override
+                public Observable<SubjectCollection> call(Filter filter) {
+                    return WaniKaniApiV2.getSubjects(filter);
+                }
+            }, "summary").updateData()
         )
-        .subscribeOn(Schedulers.io())
-        .observeOn(Schedulers.io())
-        .subscribe(new Action0() {
-            @Override
-            public void call() {
-                Intent intent = new Intent(BroadcastIntents.SYNC());
-                LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(intent);
-                checkVacationMode();
-            }
-        }, new Action1<Throwable>() {
-            @Override
-            public void call(Throwable throwable) {
-                showMessage(MESSAGE_TYPE.ERROR_UNKNOWN);
-            }
-        });
+            .subscribeOn(Schedulers.io())
+            .observeOn(Schedulers.io())
+            .subscribe(new Action0() {
+                @Override
+                public void call() {
+                    Intent intent = new Intent(BroadcastIntents.SYNC());
+                    LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(intent);
+                    checkVacationMode();
+                }
+            }, new Action1<Throwable>() {
+                @Override
+                public void call(Throwable throwable) {
+                    showMessage(MESSAGE_TYPE.ERROR_UNKNOWN);
+                }
+            });
     }
 
     private void setRefreshing() {
@@ -254,7 +261,7 @@ public class DashboardFragment extends Fragment
             mSwipeToRefreshLayout.setRefreshing(false);
 
             if (isAvailableCardSyncedSuccess && isReviewsCardSyncedSuccess && isStatusCardSyncedSuccess && isRecentUnlocksCardSyncedSuccess
-                    && isCriticalItemsCardSyncedSuccess) {
+                && isCriticalItemsCardSyncedSuccess) {
                 PrefManager.setDashboardLastUpdateDate(System.currentTimeMillis());
                 onMessageCardOkButtonClick();
             }
@@ -263,13 +270,13 @@ public class DashboardFragment extends Fragment
 
     private void registerReceivers() {
         LocalBroadcastManager.getInstance(activity).registerReceiver(mSyncCalled,
-                new IntentFilter(BroadcastIntents.SYNC()));
+            new IntentFilter(BroadcastIntents.SYNC()));
         LocalBroadcastManager.getInstance(activity).registerReceiver(mRetrofitConnectionErrorReceiver,
-                new IntentFilter(BroadcastIntents.RETROFIT_ERROR_CONNECTION()));
+            new IntentFilter(BroadcastIntents.RETROFIT_ERROR_CONNECTION()));
         LocalBroadcastManager.getInstance(activity).registerReceiver(mRetrofitUnknownErrorReceiver,
-                new IntentFilter(BroadcastIntents.RETROFIT_ERROR_UNKNOWN()));
+            new IntentFilter(BroadcastIntents.RETROFIT_ERROR_UNKNOWN()));
         LocalBroadcastManager.getInstance(activity).registerReceiver(mNotificationsReceiver,
-                new IntentFilter(BroadcastIntents.NOTIFICATION()));
+            new IntentFilter(BroadcastIntents.NOTIFICATION()));
     }
 
     private void unregisterReceivers() {

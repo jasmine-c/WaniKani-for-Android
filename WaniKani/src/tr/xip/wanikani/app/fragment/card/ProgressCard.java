@@ -97,7 +97,7 @@ public class ProgressCard extends Fragment {
 
     public void load() {
         User user = DatabaseManager.getUser();
-        LevelProgression progression = DatabaseManager.getLevelProgression();
+        LevelProgression progression = DatabaseManager.getLevelProgression(user.level);
 
         if (user != null && progression != null) {
             displayData(user, progression);

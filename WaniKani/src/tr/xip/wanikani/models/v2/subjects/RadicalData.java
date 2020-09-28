@@ -5,8 +5,8 @@ import org.joda.time.DateTime;
 import java.util.ArrayList;
 
 public class RadicalData extends SubjectData {
-    private ArrayList<Integer> amalgamation_subject_ids;
-    private ArrayList<CharacterImage> character_images;
+    public ArrayList<Integer> amalgamation_subject_ids;
+    public ArrayList<CharacterImage> character_images;
 
     public RadicalData(
             ArrayList<AuxiliaryMeaning> auxiliary_meanings, String characters, DateTime created_at,

@@ -12,6 +12,9 @@ import android.widget.ViewFlipper;
 
 import com.tonicartos.widget.stickygridheaders.StickyGridHeadersGridView;
 
+import org.joda.time.DateTime;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -23,6 +26,7 @@ import tr.xip.wanikani.database.DatabaseManager;
 import tr.xip.wanikani.models.RecentUnlocksList;
 import tr.xip.wanikani.models.Request;
 import tr.xip.wanikani.models.UnlockItem;
+import tr.xip.wanikani.models.v2.subjects.Subject;
 import tr.xip.wanikani.widget.adapter.RecentUnlocksStickyHeaderGridViewArrayAdapter;
 
 /**

@@ -19,6 +19,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.ViewFlipper;
 
+import org.joda.time.DateTime;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -33,6 +36,8 @@ import tr.xip.wanikani.app.activity.RecentUnlocksActivity;
 import tr.xip.wanikani.database.DatabaseManager;
 import tr.xip.wanikani.models.RecentUnlocksList;
 import tr.xip.wanikani.models.Request;
+import tr.xip.wanikani.models.v2.subjects.Subject;
+import tr.xip.wanikani.models.v2.subjects.UnlockedSubject;
 import tr.xip.wanikani.widget.adapter.RecentUnlocksArrayAdapter;
 import tr.xip.wanikani.models.UnlockItem;
 import tr.xip.wanikani.managers.PrefManager;
@@ -61,14 +66,15 @@ public class RecentUnlocksCard extends Fragment {
 
     RecentUnlocksCardListener mListener;
 
-    List<UnlockItem> recentUnlocksList = null;
+    ArrayList<UnlockedSubject> recentUnlocksList = null;
 
     RecentUnlocksArrayAdapter mRecentUnlocksAdapter;
 
     private BroadcastReceiver mDoLoad = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-        RecentUnlocksList list = DatabaseManager.getRecentUnlocks(PrefManager.getDashboardRecentUnlocksNumber());
+        mContext = context;
+        ArrayList<UnlockedSubject> list = DatabaseManager.getRecentUnlocks(DateTime.now().minusDays(30), 10);
         if (list != null) {
             displaydata(list);
         }
@@ -152,7 +158,7 @@ public class RecentUnlocksCard extends Fragment {
         return dp * mContext.getResources().getDisplayMetrics().density;
     }
 
-    private void displaydata(RecentUnlocksList list) {
+    private void displaydata(ArrayList<UnlockedSubject> list) {
         int height;
 
         if (list != null) {
@@ -209,7 +215,7 @@ public class RecentUnlocksCard extends Fragment {
 
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-            UnlockItem item = recentUnlocksList.get(position);
+            Subject item = recentUnlocksList.get(position);
 
             Intent intent = new Intent(getActivity(), ItemDetailsActivity.class);
             intent.putExtra(ItemDetailsActivity.ARG_ITEM, item);

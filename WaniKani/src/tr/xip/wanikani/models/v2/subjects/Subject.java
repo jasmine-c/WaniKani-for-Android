@@ -24,14 +24,19 @@ public abstract class Subject extends Resource<SubjectData> implements Serializa
         int id = jsonObject.get("id").getAsInt();
         String url = jsonObject.get("url").getAsString();
         DateTime updateTime = context.deserialize(jsonObject.get("data_updated_at"), DateTime.class);
+        JsonElement data = jsonObject.get("data");
 
-        switch(subjectType) {
-            case "radical":
-                return new Radical(id, subjectType, url, updateTime, (RadicalData) context.deserialize(json, RadicalData.class));
-            case "kanji":
-                return new Kanji(id, subjectType, url, updateTime, (KanjiData) context.deserialize(json, KanjiData.class));
-            case "vocabulary":
-                return new Vocabulary(id, subjectType, url, updateTime, (VocabularyData) context.deserialize(json, VocabularyData.class));
+        try {
+            switch (subjectType) {
+                case "radical":
+                    return new Radical(id, subjectType, url, updateTime, (RadicalData) context.deserialize(data, RadicalData.class));
+                case "kanji":
+                    return new Kanji(id, subjectType, url, updateTime, (KanjiData) context.deserialize(data, KanjiData.class));
+                case "vocabulary":
+                    return new Vocabulary(id, subjectType, url, updateTime, (VocabularyData) context.deserialize(data, VocabularyData.class));
+            }
+        } catch (Exception e) {
+            throw e;
         }
 
         throw new JsonParseException("Unknown subject type " + subjectType);

@@ -6,13 +6,13 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class KanjiData extends SubjectData implements Serializable {
-    private ArrayList<Integer> amalgamation_subject_ids;
-    private ArrayList<Integer> component_subject_ids;
-    private String meaning_hint;
-    private String reading_hint;
-    private String reading_mnemonic;
-    private ArrayList<KanjiReading> readings;
-    private ArrayList<Integer> visually_similar_subject_ids;
+    public ArrayList<Integer> amalgamation_subject_ids;
+    public ArrayList<Integer> component_subject_ids;
+    public String meaning_hint;
+    public String reading_hint;
+    public String reading_mnemonic;
+    public ArrayList<KanjiReading> readings;
+    public ArrayList<Integer> visually_similar_subject_ids;
 
     public KanjiData(
             ArrayList<AuxiliaryMeaning> auxiliary_meanings, String characters, DateTime created_at,
