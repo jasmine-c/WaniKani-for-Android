@@ -37,6 +37,7 @@ import tr.xip.wanikani.managers.PrefManager;
 import tr.xip.wanikani.models.CriticalItem;
 import tr.xip.wanikani.models.CriticalItemsList;
 import tr.xip.wanikani.models.Request;
+import tr.xip.wanikani.models.v2.subjects.CriticalSubject;
 import tr.xip.wanikani.utils.Fonts;
 import tr.xip.wanikani.utils.Utils;
 import tr.xip.wanikani.widget.adapter.CriticalItemsAdapter;
@@ -46,204 +47,205 @@ import tr.xip.wanikani.widget.adapter.CriticalItemsAdapter;
  */
 public class CriticalItemsCard extends Fragment {
 
-    View rootView;
-    Utils utils;
+	View rootView;
+	Utils utils;
 
-    Context mContext;
+	Context mContext;
 
-    LinearLayout mCard;
+	LinearLayout mCard;
 
-    TextView mCardTitle;
-    ListView mCriticalItemsList;
+	TextView mCardTitle;
+	ListView mCriticalItemsList;
 
-    ViewFlipper mViewFlipper;
+	ViewFlipper mViewFlipper;
 
-    ViewFlipper mMessageViewFlipper;
-    ImageView mMessageIcon;
-    TextView mMessageTitle;
-    TextView mMessageSummary;
+	ViewFlipper mMessageViewFlipper;
+	ImageView mMessageIcon;
+	TextView mMessageTitle;
+	TextView mMessageSummary;
 
-    RelativeLayout mMoreButton;
+	RelativeLayout mMoreButton;
 
-    CriticalItemsAdapter mCriticalItemsAdapter;
+	CriticalItemsAdapter mCriticalItemsAdapter;
 
-    CriticalItemsCardListener mListener;
+	CriticalItemsCardListener mListener;
 
-    List<CriticalItem> criticalItemsList = null;
+	ArrayList<CriticalSubject> criticalItemsList = null;
 
-    private BroadcastReceiver mDoLoad = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-//        CriticalItemsList list = DatabaseManager.getCriticalItems(PrefManager.getDashboardCriticalItemsPercentage());
-//        displayData(list);
-        }
-    };
+	private BroadcastReceiver mDoLoad = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			mContext = context;
+			ArrayList<CriticalSubject> list = DatabaseManager.getCriticalSubjects(PrefManager.getDashboardCriticalItemsPercentage(), 10);
+			displayData(list);
+		}
+	};
 
-    public void setListener(CriticalItemsCardListener listener, Context context) {
-        mListener = listener;
-        LocalBroadcastManager.getInstance(context).registerReceiver(mDoLoad,
-                new IntentFilter(BroadcastIntents.SYNC()));
-    }
+	public void setListener(CriticalItemsCardListener listener, Context context) {
+		mListener = listener;
+		LocalBroadcastManager.getInstance(context).registerReceiver(mDoLoad,
+			new IntentFilter(BroadcastIntents.SYNC()));
+	}
 
-    @Override
-    public void onCreate(Bundle state) {
-        utils = new Utils(getActivity());
-        super.onCreate(state);
-    }
+	@Override
+	public void onCreate(Bundle state) {
+		utils = new Utils(getActivity());
+		super.onCreate(state);
+	}
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.card_critical_items, null);
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+	                         Bundle savedInstanceState) {
+		rootView = inflater.inflate(R.layout.card_critical_items, null);
 
-        mCardTitle = (TextView) rootView.findViewById(R.id.card_critical_items_title);
-        mCriticalItemsList = (ListView) rootView.findViewById(R.id.card_critical_items_list);
+		mCardTitle = (TextView) rootView.findViewById(R.id.card_critical_items_title);
+		mCriticalItemsList = (ListView) rootView.findViewById(R.id.card_critical_items_list);
 
-        mViewFlipper = (ViewFlipper) rootView.findViewById(R.id.card_critical_items_view_flipper);
-        mViewFlipper.setInAnimation(getActivity(), R.anim.abc_fade_in);
-        mViewFlipper.setOutAnimation(getActivity(), R.anim.abc_fade_out);
+		mViewFlipper = (ViewFlipper) rootView.findViewById(R.id.card_critical_items_view_flipper);
+		mViewFlipper.setInAnimation(getActivity(), R.anim.abc_fade_in);
+		mViewFlipper.setOutAnimation(getActivity(), R.anim.abc_fade_out);
 
-        mMessageViewFlipper = (ViewFlipper) rootView.findViewById(R.id.card_critical_items_connection_view_flipper);
-        mMessageViewFlipper.setInAnimation(getActivity(), R.anim.abc_fade_in);
-        mMessageViewFlipper.setOutAnimation(getActivity(), R.anim.abc_fade_out);
+		mMessageViewFlipper = (ViewFlipper) rootView.findViewById(R.id.card_critical_items_connection_view_flipper);
+		mMessageViewFlipper.setInAnimation(getActivity(), R.anim.abc_fade_in);
+		mMessageViewFlipper.setOutAnimation(getActivity(), R.anim.abc_fade_out);
 
-        mCard = (LinearLayout) rootView.findViewById(R.id.card_critical_items_card);
+		mCard = (LinearLayout) rootView.findViewById(R.id.card_critical_items_card);
 
-        mMessageIcon = (ImageView) rootView.findViewById(R.id.card_critical_items_message_icon);
-        mMessageTitle = (TextView) rootView.findViewById(R.id.card_critical_items_message_title);
-        mMessageSummary = (TextView) rootView.findViewById(R.id.card_critical_items_message_summary);
+		mMessageIcon = (ImageView) rootView.findViewById(R.id.card_critical_items_message_icon);
+		mMessageTitle = (TextView) rootView.findViewById(R.id.card_critical_items_message_title);
+		mMessageSummary = (TextView) rootView.findViewById(R.id.card_critical_items_message_summary);
 
-        mCriticalItemsList.setOnItemClickListener(new criticalItemListItemClickListener());
+		mCriticalItemsList.setOnItemClickListener(new criticalItemListItemClickListener());
 
-        mMoreButton = (RelativeLayout) rootView.findViewById(R.id.card_critical_items_more_button);
-        mMoreButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(getActivity(), CriticalItemsActivity.class));
-            }
-        });
+		mMoreButton = (RelativeLayout) rootView.findViewById(R.id.card_critical_items_more_button);
+		mMoreButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				startActivity(new Intent(getActivity(), CriticalItemsActivity.class));
+			}
+		});
 
-        return rootView;
-    }
+		return rootView;
+	}
 
-    public int setCriticalItemsHeightBasedOnListView(ListView listView) {
-        ListAdapter listAdapter = listView.getAdapter();
+	public int setCriticalItemsHeightBasedOnListView(ListView listView) {
+		ListAdapter listAdapter = listView.getAdapter();
 
-        if (listAdapter == null) {
-            return (int) pxFromDp(550);
-        } else {
+		if (listAdapter == null) {
+			return (int) pxFromDp(550);
+		} else {
 
-            int totalHeight = listView.getPaddingTop() + listView.getPaddingBottom();
-            for (int i = 0; i < listAdapter.getCount(); i++) {
-                View listItem = listAdapter.getView(i, null, listView);
-                if (listItem instanceof ViewGroup) {
-                    listItem.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-                }
-                listItem.measure(0, 0);
-                totalHeight += listItem.getMeasuredHeight();
-            }
+			int totalHeight = listView.getPaddingTop() + listView.getPaddingBottom();
+			for (int i = 0; i < listAdapter.getCount(); i++) {
+				View listItem = listAdapter.getView(i, null, listView);
+				if (listItem instanceof ViewGroup) {
+					listItem.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+				}
+				listItem.measure(0, 0);
+				totalHeight += listItem.getMeasuredHeight();
+			}
 
-            totalHeight += mCardTitle.getMeasuredHeight();
-            totalHeight += pxFromDp(32); // Add the paddings as well
+			totalHeight += mCardTitle.getMeasuredHeight();
+			totalHeight += pxFromDp(32); // Add the paddings as well
 
-            return totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
-        }
-    }
+			return totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
+		}
+	}
 
-    private float pxFromDp(float dp) {
-        return dp * mContext.getResources().getDisplayMetrics().density;
-    }
+	private float pxFromDp(float dp) {
+		return dp * mContext.getResources().getDisplayMetrics().density;
+	}
 
-    private void displayData(CriticalItemsList list) {
-        int height;
+	private void displayData(ArrayList<CriticalSubject> list) {
+		int height;
 
-        if (list != null) {
-            List<CriticalItem> mNewList = new ArrayList<CriticalItem>();
+		if (list != null) {
+			ArrayList<CriticalSubject> mNewList = new ArrayList<>();
 
-            // Cleanup null items (WaniKani API smh)
-            list.removeAll(Collections.singleton(null));
+			// Cleanup null items (WaniKani API smh)
+			list.removeAll(Collections.singleton(null));
 
-            for (int i = 0; i < list.size(); i++)
-                if (i < PrefManager.getCriticalItemsNumber())
-                    mNewList.add(list.get(i));
+			for (int i = 0; i < list.size(); i++)
+				if (i < PrefManager.getCriticalItemsNumber())
+					mNewList.add(list.get(i));
 
-            criticalItemsList = mNewList;
+			criticalItemsList = mNewList;
 
-            mCriticalItemsAdapter = new CriticalItemsAdapter(mContext,
-                    R.layout.item_critical, mNewList, new Fonts().getKanjiFont(mContext));
+			mCriticalItemsAdapter = new CriticalItemsAdapter(mContext,
+				R.layout.item_critical, mNewList, new Fonts().getKanjiFont(mContext));
 
-            int sixteenDpPaddingInPx = (int) pxFromDp(16);
-            int sixtyFourDpInPx = (int) pxFromDp(64);
+			int sixteenDpPaddingInPx = (int) pxFromDp(16);
+			int sixtyFourDpInPx = (int) pxFromDp(64);
 
-            if (mNewList.size() < list.size()) {
-                mCriticalItemsList.setPadding(
-                        sixteenDpPaddingInPx,
-                        sixteenDpPaddingInPx,
-                        sixteenDpPaddingInPx,
-                        sixtyFourDpInPx
-                );
-                mMoreButton.setVisibility(View.VISIBLE);
-            } else {
-                mCriticalItemsList.setPadding(sixteenDpPaddingInPx,
-                        sixteenDpPaddingInPx,
-                        sixteenDpPaddingInPx,
-                        sixteenDpPaddingInPx
-                );
-                mMoreButton.setVisibility(View.GONE);
-            }
+			if (mNewList.size() < list.size()) {
+				mCriticalItemsList.setPadding(
+					sixteenDpPaddingInPx,
+					sixteenDpPaddingInPx,
+					sixteenDpPaddingInPx,
+					sixtyFourDpInPx
+				);
+				mMoreButton.setVisibility(View.VISIBLE);
+			} else {
+				mCriticalItemsList.setPadding(sixteenDpPaddingInPx,
+					sixteenDpPaddingInPx,
+					sixteenDpPaddingInPx,
+					sixteenDpPaddingInPx
+				);
+				mMoreButton.setVisibility(View.GONE);
+			}
 
-            if (mCriticalItemsAdapter.getCount() != 0) {
-                mCriticalItemsList.setAdapter(mCriticalItemsAdapter);
+			if (mCriticalItemsAdapter.getCount() != 0) {
+				mCriticalItemsList.setAdapter(mCriticalItemsAdapter);
 
-                if (mMessageViewFlipper.getDisplayedChild() == 1) {
-                    mMessageViewFlipper.showPrevious();
-                }
+				if (mMessageViewFlipper.getDisplayedChild() == 1) {
+					mMessageViewFlipper.showPrevious();
+				}
 
-                height = setCriticalItemsHeightBasedOnListView(mCriticalItemsList);
-            } else {
-                mMessageIcon.setImageResource(R.drawable.ic_thumb_up_black_36dp);
-                mMessageTitle.setText(R.string.card_content_critical_no_items_title);
-                mMessageSummary.setText(R.string.card_content_critical_no_items_summary);
+				height = setCriticalItemsHeightBasedOnListView(mCriticalItemsList);
+			} else {
+				mMessageIcon.setImageResource(R.drawable.ic_thumb_up_black_36dp);
+				mMessageTitle.setText(R.string.card_content_critical_no_items_title);
+				mMessageSummary.setText(R.string.card_content_critical_no_items_summary);
 
-                if (mMessageViewFlipper.getDisplayedChild() == 0) {
-                    mMessageViewFlipper.showNext();
-                }
+				if (mMessageViewFlipper.getDisplayedChild() == 0) {
+					mMessageViewFlipper.showNext();
+				}
 
-                height = (int) pxFromDp(168);
-            }
+				height = (int) pxFromDp(168);
+			}
 
-            mListener.onCriticalItemsCardSyncFinishedListener(height, DashboardFragment.SYNC_RESULT_SUCCESS);
-        } else {
-            mMessageIcon.setImageResource(R.drawable.ic_error_red_36dp);
-            mMessageTitle.setText(R.string.error_oops);
-            mMessageSummary.setText(R.string.error_display_items);
+			mListener.onCriticalItemsCardSyncFinishedListener(height, DashboardFragment.SYNC_RESULT_SUCCESS);
+		} else {
+			mMessageIcon.setImageResource(R.drawable.ic_error_red_36dp);
+			mMessageTitle.setText(R.string.error_oops);
+			mMessageSummary.setText(R.string.error_display_items);
 
-            if (mMessageViewFlipper.getDisplayedChild() == 0) {
-                mMessageViewFlipper.showNext();
-            }
+			if (mMessageViewFlipper.getDisplayedChild() == 0) {
+				mMessageViewFlipper.showNext();
+			}
 
-            height = (int) pxFromDp(158);
+			height = (int) pxFromDp(158);
 
-            mListener.onCriticalItemsCardSyncFinishedListener(height, DashboardFragment.SYNC_RESULT_FAILED);
-        }
+			mListener.onCriticalItemsCardSyncFinishedListener(height, DashboardFragment.SYNC_RESULT_FAILED);
+		}
 
-        if (mViewFlipper.getDisplayedChild() == 0) {
-            mViewFlipper.showNext();
-        }
-    }
+		if (mViewFlipper.getDisplayedChild() == 0) {
+			mViewFlipper.showNext();
+		}
+	}
 
-    public interface CriticalItemsCardListener {
-        public void onCriticalItemsCardSyncFinishedListener(int height, String result);
-    }
+	public interface CriticalItemsCardListener {
+		public void onCriticalItemsCardSyncFinishedListener(int height, String result);
+	}
 
-    private class criticalItemListItemClickListener implements android.widget.AdapterView.OnItemClickListener {
-        @Override
-        public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-            CriticalItem item = criticalItemsList.get(position);
+	private class criticalItemListItemClickListener implements android.widget.AdapterView.OnItemClickListener {
+		@Override
+		public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+			CriticalSubject item = criticalItemsList.get(position);
 
-            Intent intent = new Intent(getActivity(), ItemDetailsActivity.class);
-            intent.putExtra(ItemDetailsActivity.ARG_ITEM, item);
-            getActivity().startActivity(intent);
-        }
-    }
+			Intent intent = new Intent(getActivity(), ItemDetailsActivity.class);
+			intent.putExtra(ItemDetailsActivity.ARG_ITEM, item);
+			getActivity().startActivity(intent);
+		}
+	}
 }

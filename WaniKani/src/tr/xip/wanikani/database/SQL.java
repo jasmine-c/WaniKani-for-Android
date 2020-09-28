@@ -10,6 +10,7 @@ import tr.xip.wanikani.database.table.StudyQueueTable;
 import tr.xip.wanikani.database.table.UsersTable;
 import tr.xip.wanikani.database.v2.AssignmentsTable;
 import tr.xip.wanikani.database.v2.LastUpdatedTable;
+import tr.xip.wanikani.database.v2.ReviewStatisticsTable;
 import tr.xip.wanikani.database.v2.SubjectsTable;
 import tr.xip.wanikani.database.v2.SummaryTable;
 
@@ -273,4 +274,25 @@ public class SQL {
 
     public static final String DELETE_TABLE_SUBJECTS = "DROP TABLE IF EXISTS "
         + SubjectsTable.TABLE_NAME;
+
+    public static final String CREATE_TABLE_REVIEW_STATISTICS = "CREATE TABLE "
+        + ReviewStatisticsTable.TABLE_NAME + " ("
+        + ReviewStatisticsTable.COLUMN_NAME_ID + INTEGER_PRIMARY_KEY + COMMA_SEP
+        + ReviewStatisticsTable.COLUMN_NAME_CREATED_AT + INTEGER_TYPE + COMMA_SEP
+        + ReviewStatisticsTable.COLUMN_NAME_HIDDEN + INTEGER_TYPE + COMMA_SEP
+        + ReviewStatisticsTable.COLUMN_NAME_MEANING_CORRECT + INTEGER_TYPE + COMMA_SEP
+        + ReviewStatisticsTable.COLUMN_NAME_MEANING_CURRENT_STREAK + INTEGER_TYPE + COMMA_SEP
+        + ReviewStatisticsTable.COLUMN_NAME_MEANING_INCORRECT + INTEGER_TYPE + COMMA_SEP
+        + ReviewStatisticsTable.COLUMN_NAME_MEANING_MAX_STREAK + INTEGER_TYPE + COMMA_SEP
+        + ReviewStatisticsTable.COLUMN_NAME_PERCENTAGE_CORRECT + INTEGER_TYPE + COMMA_SEP
+        + ReviewStatisticsTable.COLUMN_NAME_READING_CORRECT + INTEGER_TYPE + COMMA_SEP
+        + ReviewStatisticsTable.COLUMN_NAME_READING_CURRENT_STREAK + INTEGER_TYPE + COMMA_SEP
+        + ReviewStatisticsTable.COLUMN_NAME_READING_INCORRECT + INTEGER_TYPE + COMMA_SEP
+        + ReviewStatisticsTable.COLUMN_NAME_READING_MAX_STREAK + INTEGER_TYPE + COMMA_SEP
+        + ReviewStatisticsTable.COLUMN_NAME_SUBJECT_ID + INTEGER_TYPE + COMMA_SEP
+        + ReviewStatisticsTable.COLUMN_NAME_SUBJECT_TYPE + TEXT_TYPE + COMMA_SEP
+        + ReviewStatisticsTable.COLUMN_NAME_NULLABLE + TEXT_TYPE + ")";
+
+    public static final String DELETE_TABLE_REVIEW_STATISTICS = "DROP TABLE IF EXISTS "
+        + ReviewStatisticsTable.TABLE_NAME;
 }

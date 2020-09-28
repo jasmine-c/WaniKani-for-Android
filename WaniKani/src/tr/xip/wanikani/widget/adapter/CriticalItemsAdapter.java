@@ -12,16 +12,19 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import tr.xip.wanikani.R;
 import tr.xip.wanikani.models.BaseItem;
 import tr.xip.wanikani.models.CriticalItem;
+import tr.xip.wanikani.models.v2.subjects.CriticalSubject;
+import tr.xip.wanikani.models.v2.subjects.RadicalData;
 
 /**
  * Created by xihsa_000 on 3/14/14.
  */
-public class CriticalItemsAdapter extends ArrayAdapter<CriticalItem> {
+public class CriticalItemsAdapter extends ArrayAdapter<CriticalSubject> {
 
     Context context;
     Typeface typeface;
@@ -31,9 +34,9 @@ public class CriticalItemsAdapter extends ArrayAdapter<CriticalItem> {
     ImageView mItemCharacterImage;
     TextView mItemPercentage;
 
-    private List<CriticalItem> items;
+    private ArrayList<CriticalSubject> items;
 
-    public CriticalItemsAdapter(Context context, int textViewResourceId, List<CriticalItem> objects, Typeface typeface) {
+    public CriticalItemsAdapter(Context context, int textViewResourceId, ArrayList<CriticalSubject> objects, Typeface typeface) {
         super(context, textViewResourceId, objects);
         this.items = objects;
         this.context = context;
@@ -43,7 +46,7 @@ public class CriticalItemsAdapter extends ArrayAdapter<CriticalItem> {
     public View getView(int position, View convertView, ViewGroup parent) {
         View v = convertView;
 
-        CriticalItem item = items.get(position);
+        CriticalSubject item = items.get(position);
 
         if (v == null) {
             LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -57,33 +60,26 @@ public class CriticalItemsAdapter extends ArrayAdapter<CriticalItem> {
 
         mItemCharacter.setTypeface(typeface);
 
-        if (item.getType() == BaseItem.ItemType.RADICAL) {
-            mItemType.setBackgroundResource(R.drawable.oval_radical);
+        switch (item.object) {
+            case "radical": mItemType.setBackgroundResource(R.drawable.oval_radical); break;
+            case "kanji": mItemType.setBackgroundResource(R.drawable.oval_kanji); break;
+            case "vocabulary": mItemType.setBackgroundResource(R.drawable.oval_vocabulary); break;
         }
 
-        if (item.getType() == BaseItem.ItemType.KANJI) {
-            mItemType.setBackgroundResource(R.drawable.oval_kanji);
-        }
-
-        if (item.getType() == BaseItem.ItemType.VOCABULARY) {
-            mItemType.setBackgroundResource(R.drawable.oval_vocabulary);
-        }
-
-        if (item.getImage() == null) {
+        if (item.data.characters != null) {
             mItemCharacter.setVisibility(View.VISIBLE);
             mItemCharacterImage.setVisibility(View.GONE);
-            mItemCharacter.setText(item.getCharacter());
+            mItemCharacter.setText(item.data.characters);
         } else {
             mItemCharacter.setVisibility(View.GONE);
             mItemCharacterImage.setVisibility(View.VISIBLE);
             Picasso.with(context)
-                    .load(item.getImage())
+                    .load(((RadicalData) item.data).character_images.get(0).url)
                     .into(mItemCharacterImage);
             mItemCharacterImage.setColorFilter(context.getResources().getColor(R.color.text_gray), PorterDuff.Mode.SRC_ATOP);
         }
 
-        mItemCharacter.setText(item.getCharacter());
-        mItemPercentage.setText(item.getPercentage() + "");
+        mItemPercentage.setText(item.percentage + "");
 
         return v;
     }

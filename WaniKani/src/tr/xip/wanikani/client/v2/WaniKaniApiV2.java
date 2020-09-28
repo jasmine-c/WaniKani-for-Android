@@ -22,8 +22,6 @@ import rx.Observable;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import tr.xip.wanikani.BuildConfig;
-import tr.xip.wanikani.database.DatabaseManager;
-import tr.xip.wanikani.database.v2.AssignmentsTable;
 import tr.xip.wanikani.managers.PrefManager;
 import tr.xip.wanikani.models.v2.Collection;
 import tr.xip.wanikani.models.v2.Resource;
@@ -32,7 +30,8 @@ import tr.xip.wanikani.models.v2.reviews.AssignmentCollection;
 import tr.xip.wanikani.models.v2.reviews.Review;
 import tr.xip.wanikani.models.v2.reviews.ReviewCreate;
 import tr.xip.wanikani.models.v2.reviews.ReviewCreateResponse;
-import tr.xip.wanikani.models.v2.reviews.ReviewStatistic;
+import tr.xip.wanikani.models.v2.reviews.ReviewStatisticCollection;
+import tr.xip.wanikani.models.v2.reviews.ReviewStatisticData;
 import tr.xip.wanikani.models.v2.reviews.Summary;
 import tr.xip.wanikani.models.v2.srs.LevelProgression;
 import tr.xip.wanikani.models.v2.srs.Reset;
@@ -165,12 +164,12 @@ public abstract class WaniKaniApiV2 {
 		return service.createReview(authorizationToken, review);
 	}
 
-	public static Observable<Collection<Resource<ReviewStatistic>>> getReviewStatistics(Filter filters) {
+	public static Observable<ReviewStatisticCollection> getReviewStatistics(Filter filters) {
 		return service.getReviewStatistics(authorizationToken,
 			filters.filters);
 	}
 
-	public static Observable<Resource<ReviewStatistic>> getReviewStatistic(int id) {
+	public static Observable<Resource<ReviewStatisticData>> getReviewStatistic(int id) {
 		return service.getReviewStatistic(authorizationToken,
 			Integer.toString(id));
 	}

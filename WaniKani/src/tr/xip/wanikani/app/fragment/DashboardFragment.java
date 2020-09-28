@@ -43,11 +43,17 @@ import tr.xip.wanikani.client.v2.Filter;
 import tr.xip.wanikani.client.v2.WaniKaniApiV2;
 import tr.xip.wanikani.content.receiver.BroadcastIntents;
 import tr.xip.wanikani.database.DatabaseManager;
+import tr.xip.wanikani.database.table.UsersTable;
+import tr.xip.wanikani.database.v2.AssignmentsTable;
+import tr.xip.wanikani.database.v2.ReviewStatisticsTable;
+import tr.xip.wanikani.database.v2.SubjectsTable;
+import tr.xip.wanikani.database.v2.SummaryTable;
 import tr.xip.wanikani.managers.PrefManager;
 import tr.xip.wanikani.models.Notification;
 import tr.xip.wanikani.models.User;
 import tr.xip.wanikani.models.v2.Resource;
 import tr.xip.wanikani.models.v2.reviews.AssignmentCollection;
+import tr.xip.wanikani.models.v2.reviews.ReviewStatisticCollection;
 import tr.xip.wanikani.models.v2.reviews.Summary;
 import tr.xip.wanikani.models.v2.subjects.SubjectCollection;
 
@@ -92,12 +98,6 @@ public class DashboardFragment extends Fragment
     private Context context;
     private SwipeRefreshLayout mSwipeToRefreshLayout;
 
-    private BroadcastReceiver mSyncCalled = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            mSwipeToRefreshLayout.setRefreshing(true);
-        }
-    };
     private BroadcastReceiver mRetrofitConnectionErrorReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
             showMessage(MESSAGE_TYPE.ERROR_NO_CONNECTION);
@@ -187,47 +187,46 @@ public class DashboardFragment extends Fragment
         transaction.commit();
 
         sync();
-        setRefreshing();
 
         return rootView;
     }
 
     private void sync() {
+        setRefreshing();
+
         showNotificationIfExists();
 
         Completable.merge(
-//                WaniKaniApiV2.getReviews(new Filter()).toCompletable(),
-//                WaniKaniApiV2.getLevelProgressions(new Filter()).toCompletable(),
-//                WaniKaniApiV2.getResets(new Filter()).toCompletable(),
-//                WaniKaniApiV2.getReviewStatistics(new Filter()).toCompletable(),
-//                WaniKaniApiV2.getSpacedRepetitionSystems(new Filter()).toCompletable(),
-//                WaniKaniApiV2.getStudyMaterials(new Filter()).toCompletable(),
-//                WaniKaniApiV2.getVoiceActors(new Filter()).toCompletable(),
-//                WaniKaniApiV2.getSubjects(new Filter()).toCompletable()
             new DataUpdater(new Func1<Filter, Observable<Resource<tr.xip.wanikani.models.v2.user.User>>>() {
                 @Override
                 public Observable<Resource<tr.xip.wanikani.models.v2.user.User>> call(Filter filter) {
                     return WaniKaniApiV2.getUser();
                 }
-            }, "user").updateData(),
+            }, UsersTable.TABLE_NAME).updateData(),
             new DataUpdater(new Func1<Filter, Observable<AssignmentCollection>>() {
                 @Override
                 public Observable<AssignmentCollection> call(Filter filter) {
                     return WaniKaniApiV2.getAssignments(filter);
                 }
-            }, "assignments").updateData(),
+            }, AssignmentsTable.TABLE_NAME).updateData(),
             new DataUpdater(new Func1<Filter, Observable<Summary>>() {
                 @Override
                 public Observable<Summary> call(Filter filter) {
                     return WaniKaniApiV2.getSummary();
                 }
-            }, "summary").updateData(),
+            }, SummaryTable.TABLE_NAME).updateData(),
             new DataUpdater(new Func1<Filter, Observable<SubjectCollection>>() {
                 @Override
                 public Observable<SubjectCollection> call(Filter filter) {
                     return WaniKaniApiV2.getSubjects(filter);
                 }
-            }, "summary").updateData()
+            }, SubjectsTable.TABLE_NAME).updateData(),
+            new DataUpdater(new Func1<Filter, Observable<ReviewStatisticCollection>>() {
+                @Override
+                public Observable<ReviewStatisticCollection> call(Filter filter) {
+                    return WaniKaniApiV2.getReviewStatistics(filter);
+                }
+            }, ReviewStatisticsTable.TABLE_NAME).updateData()
         )
             .subscribeOn(Schedulers.io())
             .observeOn(Schedulers.io())
@@ -269,8 +268,6 @@ public class DashboardFragment extends Fragment
     }
 
     private void registerReceivers() {
-        LocalBroadcastManager.getInstance(activity).registerReceiver(mSyncCalled,
-            new IntentFilter(BroadcastIntents.SYNC()));
         LocalBroadcastManager.getInstance(activity).registerReceiver(mRetrofitConnectionErrorReceiver,
             new IntentFilter(BroadcastIntents.RETROFIT_ERROR_CONNECTION()));
         LocalBroadcastManager.getInstance(activity).registerReceiver(mRetrofitUnknownErrorReceiver,
@@ -280,7 +277,6 @@ public class DashboardFragment extends Fragment
     }
 
     private void unregisterReceivers() {
-        LocalBroadcastManager.getInstance(activity).unregisterReceiver(mSyncCalled);
         LocalBroadcastManager.getInstance(activity).unregisterReceiver(mRetrofitConnectionErrorReceiver);
         LocalBroadcastManager.getInstance(activity).unregisterReceiver(mRetrofitUnknownErrorReceiver);
         LocalBroadcastManager.getInstance(activity).unregisterReceiver(mNotificationsReceiver);

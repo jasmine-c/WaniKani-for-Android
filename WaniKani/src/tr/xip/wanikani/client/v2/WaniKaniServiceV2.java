@@ -13,6 +13,7 @@ import retrofit2.http.QueryMap;
 import tr.xip.wanikani.models.v2.reviews.Assignment;
 import tr.xip.wanikani.models.v2.reviews.AssignmentCollection;
 import tr.xip.wanikani.models.v2.Collection;
+import tr.xip.wanikani.models.v2.reviews.ReviewStatisticCollection;
 import tr.xip.wanikani.models.v2.reviews.Summary;
 import tr.xip.wanikani.models.v2.srs.LevelProgression;
 import tr.xip.wanikani.models.v2.srs.Reset;
@@ -20,7 +21,7 @@ import tr.xip.wanikani.models.v2.Resource;
 import tr.xip.wanikani.models.v2.reviews.Review;
 import tr.xip.wanikani.models.v2.reviews.ReviewCreate;
 import tr.xip.wanikani.models.v2.reviews.ReviewCreateResponse;
-import tr.xip.wanikani.models.v2.reviews.ReviewStatistic;
+import tr.xip.wanikani.models.v2.reviews.ReviewStatisticData;
 import tr.xip.wanikani.models.v2.srs.SpacedRepetitionSystem;
 import tr.xip.wanikani.models.v2.subjects.StudyMaterial;
 import tr.xip.wanikani.models.v2.subjects.StudyMaterialCreate;
@@ -96,13 +97,13 @@ public interface WaniKaniServiceV2
 
     @Headers({"Wanikani-Revision: 20170710"})
     @GET("review_statistics")
-    Observable<Collection<Resource<ReviewStatistic>>> getReviewStatistics(
+    Observable<ReviewStatisticCollection> getReviewStatistics(
             @Header("Authorization") String api_key,
             @QueryMap Map<String, String> filters);
 
     @Headers({"Wanikani-Revision: 20170710"})
     @GET("review_statistics/{id}")
-    Observable<Resource<ReviewStatistic>> getReviewStatistic(
+    Observable<Resource<ReviewStatisticData>> getReviewStatistic(
             @Header("Authorization") String api_key,
             @Path("id") String id);
 

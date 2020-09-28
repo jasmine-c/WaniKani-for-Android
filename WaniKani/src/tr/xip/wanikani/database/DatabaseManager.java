@@ -28,6 +28,7 @@ import tr.xip.wanikani.database.table.StudyQueueTable;
 import tr.xip.wanikani.database.table.UsersTable;
 import tr.xip.wanikani.database.v2.AssignmentsTable;
 import tr.xip.wanikani.database.v2.LastUpdatedTable;
+import tr.xip.wanikani.database.v2.ReviewStatisticsTable;
 import tr.xip.wanikani.database.v2.SubjectsTable;
 import tr.xip.wanikani.database.v2.SummaryTable;
 import tr.xip.wanikani.models.BaseItem;
@@ -44,11 +45,14 @@ import tr.xip.wanikani.models.User;
 import tr.xip.wanikani.models.v2.reviews.Assignment;
 import tr.xip.wanikani.models.v2.reviews.AssignmentData;
 import tr.xip.wanikani.models.v2.reviews.Lesson;
+import tr.xip.wanikani.models.v2.reviews.ReviewStatistic;
+import tr.xip.wanikani.models.v2.reviews.ReviewStatisticData;
 import tr.xip.wanikani.models.v2.reviews.Summary;
 import tr.xip.wanikani.models.v2.reviews.SummaryData;
 import tr.xip.wanikani.models.v2.subjects.AuxiliaryMeaning;
 import tr.xip.wanikani.models.v2.subjects.CharacterImage;
 import tr.xip.wanikani.models.v2.subjects.ContextSentence;
+import tr.xip.wanikani.models.v2.subjects.CriticalSubject;
 import tr.xip.wanikani.models.v2.subjects.Kanji;
 import tr.xip.wanikani.models.v2.subjects.KanjiData;
 import tr.xip.wanikani.models.v2.subjects.KanjiReading;
@@ -71,6 +75,7 @@ public class DatabaseManager {
     private static ReadWriteLock LastUpdatedLock = new ReentrantReadWriteLock();
     private static ReadWriteLock SummaryLock = new ReentrantReadWriteLock();
     private static ReadWriteLock SubjectsLock = new ReentrantReadWriteLock();
+    private static ReadWriteLock ReviewStatisticsLock = new ReentrantReadWriteLock();
 
     public static void init(Context context) {
         if (db == null) {
@@ -1408,5 +1413,123 @@ public class DatabaseManager {
 
             db.delete(NotificationsTable.TABLE_NAME, whereClause, whereArgs);
         }
+    }
+
+    public static void saveReviewStatistics(ArrayList<ReviewStatistic> data) {
+        ReviewStatisticsLock.writeLock().lock();
+
+        try {
+            deleteReviewStatistics(data);
+
+            for (ReviewStatistic reviewStatistic :
+                data) {
+                saveReviewStatistic(reviewStatistic.data);
+            }
+        } finally {
+            ReviewStatisticsLock.writeLock().unlock();
+        }
+    }
+
+    private static void deleteReviewStatistics(ArrayList<ReviewStatistic> data) {
+        ArrayList<Integer> subjectIds = new ArrayList<>();
+
+        for (ReviewStatistic reviewStatistic :
+            data) {
+            subjectIds.add(reviewStatistic.data.subject_id);
+        }
+
+        String whereClause = ReviewStatisticsTable.COLUMN_NAME_SUBJECT_ID + " IN (?)";
+        String[] whereArgs = {TextUtils.join(",", subjectIds)};
+
+        db.delete(ReviewStatisticsTable.TABLE_NAME, whereClause, whereArgs);
+    }
+
+    private static void saveReviewStatistic(ReviewStatisticData statistic) {
+        ContentValues values = new ContentValues();
+
+        values.put(ReviewStatisticsTable.COLUMN_NAME_CREATED_AT, statistic.created_at.getMillis());
+        values.put(ReviewStatisticsTable.COLUMN_NAME_HIDDEN, statistic.hidden);
+        values.put(ReviewStatisticsTable.COLUMN_NAME_MEANING_CORRECT, statistic.meaning_correct);
+        values.put(ReviewStatisticsTable.COLUMN_NAME_MEANING_CURRENT_STREAK, statistic.meaning_current_streak);
+        values.put(ReviewStatisticsTable.COLUMN_NAME_MEANING_INCORRECT, statistic.meaning_incorrect);
+        values.put(ReviewStatisticsTable.COLUMN_NAME_MEANING_MAX_STREAK, statistic.meaning_max_streak);
+        values.put(ReviewStatisticsTable.COLUMN_NAME_PERCENTAGE_CORRECT, statistic.percentage_correct);
+        values.put(ReviewStatisticsTable.COLUMN_NAME_READING_CORRECT, statistic.reading_correct);
+        values.put(ReviewStatisticsTable.COLUMN_NAME_READING_CURRENT_STREAK, statistic.reading_current_streak);
+        values.put(ReviewStatisticsTable.COLUMN_NAME_READING_INCORRECT, statistic.reading_incorrect);
+        values.put(ReviewStatisticsTable.COLUMN_NAME_READING_MAX_STREAK, statistic.reading_max_streak);
+        values.put(ReviewStatisticsTable.COLUMN_NAME_SUBJECT_ID, statistic.subject_id);
+        values.put(ReviewStatisticsTable.COLUMN_NAME_SUBJECT_TYPE, statistic.subject_type);
+
+        db.insert(ReviewStatisticsTable.TABLE_NAME, ReviewStatisticsTable.COLUMN_NAME_NULLABLE, values);
+    }
+
+    private static ReviewStatistic getReviewStatistic(Cursor c) {
+        return new ReviewStatistic(0, "", "", null, new ReviewStatisticData(
+           new DateTime(c.getLong(c.getColumnIndexOrThrow(ReviewStatisticsTable.COLUMN_NAME_CREATED_AT))),
+            c.getInt(c.getColumnIndexOrThrow(ReviewStatisticsTable.COLUMN_NAME_HIDDEN)) == 1,
+            c.getInt(c.getColumnIndexOrThrow(ReviewStatisticsTable.COLUMN_NAME_MEANING_CORRECT)),
+            c.getInt(c.getColumnIndexOrThrow(ReviewStatisticsTable.COLUMN_NAME_MEANING_CURRENT_STREAK)),
+            c.getInt(c.getColumnIndexOrThrow(ReviewStatisticsTable.COLUMN_NAME_MEANING_INCORRECT)),
+            c.getInt(c.getColumnIndexOrThrow(ReviewStatisticsTable.COLUMN_NAME_MEANING_MAX_STREAK)),
+            c.getInt(c.getColumnIndexOrThrow(ReviewStatisticsTable.COLUMN_NAME_PERCENTAGE_CORRECT)),
+            c.getInt(c.getColumnIndexOrThrow(ReviewStatisticsTable.COLUMN_NAME_READING_CORRECT)),
+            c.getInt(c.getColumnIndexOrThrow(ReviewStatisticsTable.COLUMN_NAME_READING_CURRENT_STREAK)),
+            c.getInt(c.getColumnIndexOrThrow(ReviewStatisticsTable.COLUMN_NAME_READING_INCORRECT)),
+            c.getInt(c.getColumnIndexOrThrow(ReviewStatisticsTable.COLUMN_NAME_READING_MAX_STREAK)),
+            c.getInt(c.getColumnIndexOrThrow(ReviewStatisticsTable.COLUMN_NAME_SUBJECT_ID)),
+            c.getString(c.getColumnIndexOrThrow(ReviewStatisticsTable.COLUMN_NAME_SUBJECT_TYPE))
+        ));
+    }
+
+    public static ArrayList<CriticalSubject> getCriticalSubjects(Integer percent, Integer limit) {
+        String query =
+            "select * from " + SubjectsTable.TABLE_NAME
+                + " INNER JOIN (select " + ReviewStatisticsTable.COLUMN_NAME_SUBJECT_ID + "," + ReviewStatisticsTable.COLUMN_NAME_PERCENTAGE_CORRECT + " from " + ReviewStatisticsTable.TABLE_NAME + " where " + ReviewStatisticsTable.COLUMN_NAME_PERCENTAGE_CORRECT + " <= ?) USING(subject_id)"
+                + " INNER JOIN (select " + AssignmentsTable.COLUMN_NAME_SUBJECT_ID + " from " + AssignmentsTable.TABLE_NAME + " where " + AssignmentsTable.COLUMN_NAME_BURNED_AT + " IS NULL) USING(subject_id)"
+                + " ORDER BY " + ReviewStatisticsTable.COLUMN_NAME_PERCENTAGE_CORRECT + " ASC"
+                + " LIMIT ?";
+
+        Cursor c = null;
+
+        ArrayList<CriticalSubject> results = new ArrayList<>();
+
+        try {
+            c = db.rawQuery(query, new String[]{percent.toString(), limit.toString()});
+
+            if (c == null) {
+                return null;
+            }
+
+            if (!c.moveToFirst())
+                return results;
+
+            do {
+                String subjectType = c.getString(c.getColumnIndexOrThrow(SubjectsTable.COLUMN_NAME_SUBJECT_TYPE));
+                int percentage = c.getInt(c.getColumnIndexOrThrow(ReviewStatisticsTable.COLUMN_NAME_PERCENTAGE_CORRECT));
+
+                switch (subjectType) {
+                    case "radical":
+                        Subject radical = getSingleRadical(c);
+                        results.add(new CriticalSubject(radical.id, radical.object, radical.url, radical.data_updated_at, radical.data, percentage));
+                        break;
+                    case "kanji":
+                        Subject kanji = getSingleKanji(c);
+                        results.add(new CriticalSubject(kanji.id, kanji.object, kanji.url, kanji.data_updated_at, kanji.data, percentage));
+                        break;
+                    case "vocabulary":
+                        Subject vocabulary = getSingleVocabulary(c);
+                        results.add(new CriticalSubject(vocabulary.id, vocabulary.object, vocabulary.url, vocabulary.data_updated_at, vocabulary.data, percentage));
+                        break;
+                }
+            } while (c.moveToNext());
+
+        } finally {
+            if (c != null) {
+                c.close();
+            }
+        }
+
+        return results;
     }
 }

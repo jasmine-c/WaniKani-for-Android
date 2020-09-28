@@ -20,7 +20,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // don't accidentally leak an Activity's context.
         // See this article for more information: http://bit.ly/6LRzfx
         if (mInstance == null) {
-            ctx.deleteDatabase(DATABASE_NAME);
+            //ctx.deleteDatabase(DATABASE_NAME);
             mInstance = new DatabaseHelper(ctx.getApplicationContext());
         }
         return mInstance;
@@ -43,6 +43,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(SQL.CREATE_TABLE_LAST_UPDATED);
         db.execSQL(SQL.CREATE_TABLE_ASSIGNMENTS);
         db.execSQL(SQL.CREATE_TABLE_SUBJECTS);
+        db.execSQL(SQL.CREATE_TABLE_REVIEW_STATISTICS);
     }
 
     @Override
@@ -56,6 +57,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 db.execSQL(SQL.CREATE_TABLE_LAST_UPDATED);
                 db.execSQL(SQL.CREATE_TABLE_ASSIGNMENTS);
                 db.execSQL(SQL.CREATE_TABLE_SUBJECTS);
+                db.execSQL(SQL.CREATE_TABLE_REVIEW_STATISTICS);
                 break;
         }
     }
